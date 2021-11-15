@@ -4,7 +4,8 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
-        "aws-sdk": "^2.660.0"
+        "aws-sdk": "^2.660.0",
+        "mysql": "2.18.1"
     },
     "devDependencies": {
         "jest": "^25.4.0"
