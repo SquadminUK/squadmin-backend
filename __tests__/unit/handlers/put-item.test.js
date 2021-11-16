@@ -5,7 +5,7 @@ const dynamodb = require('aws-sdk/clients/dynamodb');
 const lambda = require('../../../src/handlers/put-item.js');
 
 // This includes all tests for putItemHandler
-describe('Test putItemHandler', () => {
+describe.skip('Test putItemHandler', () => {
     let putSpy;
 
     // One-time setup and teardown, see more in https://jestjs.io/docs/en/setup-teardown

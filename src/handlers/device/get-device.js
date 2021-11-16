@@ -1,12 +1,12 @@
 const mysql = require('mysql');
 
-exports.getDeviceHandler = async (event) => {
+exports.getDeviceHandler = async (event, context, callback, connection) => {
     const { httpMethod, path } = event;
     if (httpMethod !== 'GET') {
         throw new Error(`getDeviceHandler only accepts GET method, you tried: ${httpMethod}`);
     }
     
-    const response = {
+    var response = {
         statusCode: 200,
         results: {
             device_id: '',
@@ -15,6 +15,12 @@ exports.getDeviceHandler = async (event) => {
             ios_push_notification_token: '',
             android_push_notification_token: ''
         }
+    }
+    
+    const badRequest = {
+        statusCode: 400,
+        message: "Bad request",
+        reason: null
     }
     
     connection.createConnection({
@@ -27,25 +33,32 @@ exports.getDeviceHandler = async (event) => {
     });
     
     if (connection.state === 'disconnected') {
-        connection.connect(function (err) {
-            if (err) {
-                response = badRequest;
-                reject('Failed to connect');
-            }
-            resolve();
-        }).promise();
+        try {
+            await connection.connect(function (err) {
+                if (err) {
+                    throw new Error();
+                }
+            });
+        } catch (exception) {
+            response = badRequest;
+            response.reason = "Failed to connect";
+            return response;
+        }
+        
         
         var getDeviceSql = "SELECT * FROM Device WHERE device_id = ?";
-        var userDeviceId = path.deviceId;
+        var userDeviceId = path;
         var formattedGetDeviceQuery = mysql.format(getDeviceSql, userDeviceId);
         
-        const getDeviceQuery = await connection.query(formattedGetDeviceQuery, function(err, results) {
+        var getDeviceQuery = await connection.query(formattedGetDeviceQuery, function(err, results) {
             if (err) {
                 new Error('There was an issue with the SQL statement');
-                reject();
             }
-            if (results[0] > 0) {
-                device = results [0];
+            var device;
+            if (results.length > 0) {
+                device = results[0];
+            }
+            if (device) {
                 response.results.device_id = device.device_id;
                 response.results.device_make = device.device_make;
                 response.results.device_model = device.device_model;
@@ -53,8 +66,7 @@ exports.getDeviceHandler = async (event) => {
                 response.results.android_push_notification_token = device.android_push_notification_token;
             }
             connection.end();
-            resolve();
-        }).promise();
+        });
         
     }
     

@@ -1,28 +1,85 @@
+const mysql = require('mysql');
 const lambda = require('../../../../src/handlers/device/get-device');
 
-describe('Test getDeviceHandler', () => {
+var event, context, callback;
 
-    it('should get device details', async () => {
-        
-        const event = {
-            httpMethod: 'GET',
-            path: 'device_id'
-        };
+// jest.mock('mysql', () => ({
+//     state: 'disconnected',
+//     createConnection: () => {},
+//     connect: (err) => {
+//         jest.fn();
+//     },
+//     format: jest.fn(),
+//     query: jest.fn().mockImplementation((query, callback) => callback(null, 
+//         [{ 
+//             device_id: 'device_id', device_make: 'device_make', device_model: 'device_model', ios_push_notification_token: 'ios_push', android_push_notification_token: 'android_push'
+//         }]
+//         )),
+//         end: jest.fn()
+//     })
+// );
 
-        const result = await lambda.getDeviceHandler(event);
+jest.mock('mysql', () => ({
+    state: 'disconnected',
+    createConnection: () => {},
+    // connect: (err) => {
+    //     // jest.fn();
+    //     err('hello');
+    // },
+    connect: jest.fn().mockImplementation((error) => error('hello')),
+    format: jest.fn(),
+    query: jest.fn().mockImplementation((query, callback) => callback(null, 
+        [{ 
+            device_id: 'device_id', device_make: 'device_make', device_model: 'device_model', ios_push_notification_token: 'ios_push', android_push_notification_token: 'android_push'
+        }]
+        )),
+        end: jest.fn()
+    }));
+    
+    
+    describe('Test getDeviceHandler', () => {
         
-        const expectedResult = {
-            statusCode: 200,
-            device: {
-                device_id: 'device_id',
-                device_make: 'device_make',
-                device_model: 'device_model',
-                ios_push_notification_token: 'ios_push',
-                android_push_notification_token: 'android_push'
+        beforeEach( () => jest.resetModules() );
+        
+        it('should throw an error and return that in a response when failing to connect', async () => {
+            event = {
+                httpMethod: 'GET',
+                path: 'device_id'
+            };
+            const result = await lambda.getDeviceHandler(event, context, callback, mysql);
+            
+            const expectedResult = {
+                statusCode: 400,
+                message: "Bad request",
+                reason: "Failed to connect"
             }
-        }
+            
+            expect(result).toEqual(expectedResult);
+        })
+        
+        it('should get device details', async () => {
+        
+            mysql.connect = jest.fn().mockImplementation((error) => jest.fn())
 
-        expect(result).toEqual(expectedResult);
+            event = {
+                httpMethod: 'GET',
+                path: 'device_id'
+            };
+        
+            const result = await lambda.getDeviceHandler(event, context, callback, mysql);
+        
+            const expectedResult = {
+                statusCode: 200,
+                results: {
+                    device_id: 'device_id',
+                    device_make: 'device_make',
+                    device_model: 'device_model',
+                    ios_push_notification_token: 'ios_push',
+                    android_push_notification_token: 'android_push'
+                }
+            }
+        
+            expect(result).toEqual(expectedResult);
+        });
+        
     });
-
-});
