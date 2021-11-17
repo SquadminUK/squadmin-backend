@@ -83,5 +83,17 @@ jest.mock('mysql', () => ({
 
             expect(result).toEqual(expectedResult);
         });
+
+        it('should not accept the PUT http method', async () => {
+            event = {
+                httpMethod: 'PUT',
+                path: 'device_id'
+            };
+
+            const result = await lambda.getDeviceHandler(event, context, callback, mysql);
+            const expectedResult = {"message": "Bad request", "reason": "getDeviceHandler only accepts GET method, you tried: PUT", "statusCode": 400}
+
+            expect(result).toEqual(expectedResult);
+        });
         
     });

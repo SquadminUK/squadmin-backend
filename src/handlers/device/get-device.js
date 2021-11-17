@@ -1,10 +1,6 @@
 const mysql = require('mysql');
 
 exports.getDeviceHandler = async (event, context, callback, connection) => {
-    const { httpMethod, path } = event;
-    if (httpMethod !== 'GET') {
-        throw new Error(`getDeviceHandler only accepts GET method, you tried: ${httpMethod}`);
-    }
     
     var response = {
         statusCode: 200,
@@ -17,7 +13,7 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         }
     }
     
-    const badRequest = {
+    var badRequest = {
         statusCode: 400,
         message: "Bad request",
         reason: null
@@ -28,6 +24,16 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         results: [],
         message: ''
     };
+    
+    const { httpMethod, path } = event;
+    try {
+        if (httpMethod !== 'GET') {
+            throw new Error(`getDeviceHandler only accepts GET method, you tried: ${httpMethod}`);
+        }
+    } catch(exception) {
+        badRequest.reason = exception.message;
+        return badRequest;
+    }
     
     connection.createConnection({
         connectionLimit: 10,
