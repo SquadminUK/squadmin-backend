@@ -21,7 +21,13 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         statusCode: 400,
         message: "Bad request",
         reason: null
-    }
+    };
+    
+    var noDeviceFound = {
+        statusCode: 200,
+        results: [],
+        message: ''
+    };
     
     connection.createConnection({
         connectionLimit: 10,
@@ -50,23 +56,33 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         var userDeviceId = path;
         var formattedGetDeviceQuery = mysql.format(getDeviceSql, userDeviceId);
         
-        var getDeviceQuery = await connection.query(formattedGetDeviceQuery, function(err, results) {
-            if (err) {
-                new Error('There was an issue with the SQL statement');
-            }
-            var device;
-            if (results.length > 0) {
-                device = results[0];
-            }
-            if (device) {
-                response.results.device_id = device.device_id;
-                response.results.device_make = device.device_make;
-                response.results.device_model = device.device_model;
-                response.results.ios_push_notification_token = device.ios_push_notification_token;
-                response.results.android_push_notification_token = device.android_push_notification_token;
-            }
-            connection.end();
-        });
+        try {
+            
+            
+            var getDeviceQuery = await connection.query(formattedGetDeviceQuery, function(err, results) {
+                if (err) {
+                    new Error('There was an issue with the SQL statement');
+                }
+                var device;
+                if (results.length > 0) {
+                    device = results[0];
+                } else {
+                    throw new Error('No devices found');
+                }
+                
+                if (device) {
+                    response.results.device_id = device.device_id;
+                    response.results.device_make = device.device_make;
+                    response.results.device_model = device.device_model;
+                    response.results.ios_push_notification_token = device.ios_push_notification_token;
+                    response.results.android_push_notification_token = device.android_push_notification_token;
+                }
+                connection.end();
+            });
+        } catch(exception) {
+            noDeviceFound.message = exception.message;
+            return noDeviceFound;
+        }
         
     }
     
