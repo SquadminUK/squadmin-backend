@@ -1,19 +1,7 @@
-var mysql = require('mysql');
+const mysql = require('mysql');
 
 exports.getGameByIdHandler = async (event, context, callback, connection) => {
     
-    if (connection === undefined) {
-        connection = mysql.createConnection({
-            connectionLimit: 10,
-            host: process.env.RDS_HOSTNAME,
-            user: process.env.RDS_USERNAME,
-            password: process.env.RDS_PASSWORD,
-            port: process.env.RDS_PORT,
-            database: process.env.RDS_DATABASE,
-            multipleStatements: true
-        });;
-    }
-
     var response = {
         statusCode: 200,
         game: {
@@ -62,15 +50,15 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
         return badRequest;
     }
 
-    // connection.createConnection({
-    //     connectionLimit: 10,
-    //     host: process.env.RDS_HOSTNAME,
-    //     user: process.env.RDS_USERNAME,
-    //     password: process.env.RDS_PASSWORD,
-    //     port: process.env.RDS_PORT,
-    //     database: process.env.RDS_DATABASE,
-    //     multipleStatements: true
-    // });
+    connection.createConnection({
+        connectionLimit: 10,
+        host: process.env.RDS_HOSTNAME,
+        user: process.env.RDS_USERNAME,
+        password: process.env.RDS_PASSWORD,
+        port: process.env.RDS_PORT,
+        database: process.env.RDS_DATABASE,
+        multipleStatements: true
+    });
 
     if (connection.state === 'disconnected') {
         try {
@@ -87,10 +75,10 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
         
         var getGameSql = "SELECT *  FROM OrganisedGame WHERE game_id = ?";
         var gameId = [path];
-        var formattedGetGameQuery = mysql.format(getGameSql, gameId);
+        var formattedGetGameQuery = mysql.format(updateDeviceSql, gameId);
 
         var getInvitations = "SELECT * FROM GameResponse WHERE organised_game_id = ?";
-        var formattedInvitationsQuery = mysql.format(getInvitations, gameId);
+        var formattedInvitationsQuery = mysql.format(formattedInvitationsQuery, gameId);
 
         try {
             var getGameByIdQuery = await connection.query(`formattedGetGameQuery; formattedInvitationsQuery`, function (err, results, fields) {
