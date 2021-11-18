@@ -62,24 +62,16 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
         return badRequest;
     }
 
-    // connection.createConnection({
-    //     connectionLimit: 10,
-    //     host: process.env.RDS_HOSTNAME,
-    //     user: process.env.RDS_USERNAME,
-    //     password: process.env.RDS_PASSWORD,
-    //     port: process.env.RDS_PORT,
-    //     database: process.env.RDS_DATABASE,
-    //     multipleStatements: true
-    // });
-
     if (connection.state === 'disconnected') {
         try {
             await connection.connect(function (err) {
                 if (err) {
-                    throw new Error();
+                    throw new Error('Failed to connect');
                 }
             });
+            console.log("connected");
         } catch (exception) {
+            connection.end();
             response = badRequest;
             response.reason = "Failed to connect";
             return response;
@@ -93,7 +85,9 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
         var formattedInvitationsQuery = mysql.format(getInvitations, gameId);
 
         try {
-            var getGameByIdQuery = await connection.query(`formattedGetGameQuery; formattedInvitationsQuery`, function (err, results, fields) {
+            var getGameByIdQuery = await connection.query('formattedGetGameQuery; formattedInvitationsQuery', function (err, results, fields) {
+            // var getGameByIdQuery = await connection.query(options, function (err, results, fields) {
+                connection.end();
                 if (err) {
                     throw new Error('There was an issue with the get game SQL statement');
                 }
@@ -113,10 +107,13 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
                 } else {
                     
                 }
-            })
+            });
+            
         } catch (exception) {
+            connection.end();
             badRequest.message = exception;
             return badRequest;
         }
     }
+    connection.end();
 }

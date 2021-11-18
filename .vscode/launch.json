@@ -13,7 +13,7 @@
                 "payload": {
                     "json": {
                     "httpMethod": "GET",
-                    "path": "game_id"
+                    "path": "54e0daa6-1c86-4771-a2f0-8d13de05b9ac"
                     }
                 },
                 "environmentVariables": {
