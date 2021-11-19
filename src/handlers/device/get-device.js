@@ -5,7 +5,7 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
     console.log("Event in lambda handler:" + event);
 
     var response = {
-        headers: "",
+        headers: {},
         isBase64Encoded: false,
         statusCode: 200,
         body: {
