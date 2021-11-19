@@ -46,23 +46,30 @@ jest.mock('mysql', () => ({
 
             event = {
                 httpMethod: 'GET',
-                path: 'device_id'
+                path: 'device_id',
+                pathParameters: {
+                    id: 'device_id'
+                }
             };
         
             const result = await lambda.getDeviceHandler(event, context, callback, mysql);
         
             const expectedResult = {
+                headers: "",
+                isBase64Encoded: false,
                 statusCode: 200,
-                results: {
-                    device_id: 'device_id',
-                    device_make: 'device_make',
-                    device_model: 'device_model',
-                    ios_push_notification_token: 'ios_push',
-                    android_push_notification_token: 'android_push'
+                body: {
+                    results: {
+                        device_id: 'device_id',
+                        device_make: 'device_make',
+                        device_model: 'device_model',
+                        ios_push_notification_token: 'ios_push',
+                        android_push_notification_token: 'android_push'
+                    }
                 }
             }
         
-            expect(result).toEqual(expectedResult);
+            expect(result).toEqual(JSON.stringify(expectedResult));
         });
 
         it('should return an appropriate message when no devices found', async () => {
@@ -70,7 +77,9 @@ jest.mock('mysql', () => ({
 
             event = {
                 httpMethod: 'GET',
-                path: 'device_id'
+                pathParameters: {
+                    id: 'device_id'
+                }
             };
 
             const result = await lambda.getDeviceHandler(event, context, callback, mysql);
