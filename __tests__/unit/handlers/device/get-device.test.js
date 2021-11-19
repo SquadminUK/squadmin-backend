@@ -23,7 +23,10 @@ jest.mock('mysql', () => ({
         
         it('should throw an error and return that in a response when failing to connect', async () => {
             
-            mysql.connect = jest.fn().mockImplementation((error) => error('error'));
+            // mysql.connect = jest.fn().mockImplementation((error) => error('error'));
+            mysql.connect = jest.fn().mockImplementation( (error) => {
+                error('error').rejects();
+            })
             
             event = {
                 httpMethod: 'GET',
@@ -42,7 +45,9 @@ jest.mock('mysql', () => ({
         
         it('should get device details', async () => {
         
-            mysql.connect = jest.fn().mockImplementation((error) => jest.fn())
+            mysql.connect = jest.fn().mockImplementation((error) => {
+                Promise.resolve(jest.fn())
+            })
 
             event = {
                 httpMethod: 'GET',

@@ -2,8 +2,6 @@ const mysql = require('mysql');
 
 exports.getDeviceHandler = async (event, context, callback, connection) => {
     
-    console.log("Event in lambda handler:" + event);
-
     var response = {
         headers: {},
         isBase64Encoded: false,
@@ -30,7 +28,7 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         results: [],
         message: ''
     };
-
+    
     if (connection  === undefined) {
         connection = mysql.createConnection({
             connectionLimit: 10,
@@ -51,56 +49,60 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         badRequest.reason = exception.message;
         return badRequest;
     }
-    
-    if (connection.state === 'disconnected') {
-        try {
-            await connection.connect(function (err) {
-                if (err) {
-                    throw new Error();
-                }
-            });
-        } catch (exception) {
-            response = badRequest;
-            response.reason = "Failed to connect";
-            return response;
-        }
-        
-        
-        var getDeviceSql = "SELECT * FROM Device WHERE device_id = ?";
-        var userDeviceId = event.pathParameters.id;
-        var formattedGetDeviceQuery = mysql.format(getDeviceSql, userDeviceId);
-        
-        try {
+    try {
+        if (connection.state === 'disconnected') {
             
-            
-            var getDeviceQuery = await connection.query(formattedGetDeviceQuery, function(err, results) {
-                if (err) {
-                    new Error('There was an issue with the SQL statement');
-                }
-                var device;
-                if (results.length > 0) {
-                    device = results[0];
-                } else {
-                    throw new Error('No devices found');
-                }
-                
-                if (device) {
-                    response.body.results.device_id = device.device_id;
-                    response.body.results.device_make = device.device_make;
-                    response.body.results.device_model = device.device_model;
-                    response.body.results.ios_push_notification_token = device.ios_push_notification_token;
-                    response.body.results.android_push_notification_token = device.android_push_notification_token;
-                }
-                connection.end();
+            await new Promise((resolve, reject) => {
+                connection.connect(function (err) {
+                    if (err) { 
+                        response = badRequest;
+                        reject('Failed to connect'); 
+                    }
+                    resolve();
+                });
             });
-        } catch(exception) {
-            noDeviceFound.message = exception.message;
-            return noDeviceFound;
-        }
-        
+            
+            try {
+                var getDeviceSql = "SELECT * FROM UserDevice WHERE device_id = ?";
+                var userDeviceId = event.pathParameters.id;
+                var formattedGetDeviceQuery = mysql.format(getDeviceSql, userDeviceId);
+                console.log("running query");
+
+                var getDeviceQuery = await new Promise((resolve, reject) => { 
+                    connection.query(formattedGetDeviceQuery, function(err, results) {
+                        if (err) {
+                            new Error('There was an issue with the SQL statement');
+                            reject();
+                        }
+                        var device;
+                        if (results.length > 0) {
+                            device = results[0];
+                        } else {
+                            throw new Error('No devices found');
+                        }
+                        
+                        if (device) {
+                            response.body.results.device_id = device.device_id;
+                            response.body.results.device_make = device.device_make;
+                            response.body.results.device_model = device.device_model;
+                            response.body.results.ios_push_notification_token = device.ios_push_notification_token;
+                            response.body.results.android_push_notification_token = device.android_push_notification_token;
+                        }
+                        connection.end();
+                        resolve();
+                    });
+                });
+            } catch(exception) {
+                noDeviceFound.message = exception.message;
+                return noDeviceFound;
+            }
+        }       
+    } catch (exception) {
+        response = badRequest;
+        response.reason = "Failed to connect";
+        return response;
     }
     
-
     response.body = JSON.stringify(response.body);
     return response;
     
