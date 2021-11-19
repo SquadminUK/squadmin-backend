@@ -5,13 +5,17 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
     console.log("Event in lambda handler:" + event);
 
     var response = {
+        headers: "",
+        isBase64Encoded: false,
         statusCode: 200,
-        results: {
-            device_id: '',
-            device_make: '',
-            device_model: '',
-            ios_push_notification_token: '',
-            android_push_notification_token: ''
+        body: {
+            results: {
+                device_id: '',
+                device_make: '',
+                device_model: '',
+                ios_push_notification_token: '',
+                android_push_notification_token: ' '
+            }
         }
     }
     
@@ -63,7 +67,7 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         
         
         var getDeviceSql = "SELECT * FROM Device WHERE device_id = ?";
-        var userDeviceId = path;
+        var userDeviceId = event.pathParameters.id;
         var formattedGetDeviceQuery = mysql.format(getDeviceSql, userDeviceId);
         
         try {
@@ -81,11 +85,11 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
                 }
                 
                 if (device) {
-                    response.results.device_id = device.device_id;
-                    response.results.device_make = device.device_make;
-                    response.results.device_model = device.device_model;
-                    response.results.ios_push_notification_token = device.ios_push_notification_token;
-                    response.results.android_push_notification_token = device.android_push_notification_token;
+                    response.body.results.device_id = device.device_id;
+                    response.body.results.device_make = device.device_make;
+                    response.body.results.device_model = device.device_model;
+                    response.body.results.ios_push_notification_token = device.ios_push_notification_token;
+                    response.body.results.android_push_notification_token = device.android_push_notification_token;
                 }
                 connection.end();
             });
@@ -96,6 +100,6 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         
     }
     
-    return response;
+    return JSON.stringify(response);
     
 }
