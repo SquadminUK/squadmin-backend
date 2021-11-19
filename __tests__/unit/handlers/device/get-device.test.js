@@ -55,7 +55,7 @@ jest.mock('mysql', () => ({
             const result = await lambda.getDeviceHandler(event, context, callback, mysql);
         
             const expectedResult = {
-                headers: "",
+                headers: {},
                 isBase64Encoded: false,
                 statusCode: 200,
                 body: {
