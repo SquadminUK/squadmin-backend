@@ -5,7 +5,7 @@
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  Website & Mobile starter project
+  Squadmin
 
 # Transform section specifies one or more macros that AWS CloudFormation uses to process your template
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
@@ -135,6 +135,27 @@ Resources:
             Path: /game/{id}
             Method: GET
 
+  getDeviceByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/device/get-device.getDeviceHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Description: A function used to get a single device's details for the user
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /device/{id}
+            Method: GET
 
   # DynamoDB table to store item: {id: <ID>, name: <NAME>}
   SampleTable:
