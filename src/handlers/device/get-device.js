@@ -2,7 +2,7 @@ const mysql = require('mysql');
 
 exports.getDeviceHandler = async (event, context, callback, connection) => {
     
-    console.log(event);
+    console.log("Event in lambda handler:" + event);
 
     var response = {
         statusCode: 200,
