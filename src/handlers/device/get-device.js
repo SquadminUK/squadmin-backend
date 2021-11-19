@@ -24,6 +24,17 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         results: [],
         message: ''
     };
+
+    if (connection  === undefined) {
+        connection = mysql.createConnection({
+            connectionLimit: 10,
+            host: process.env.RDS_HOSTNAME,
+            user: process.env.RDS_USERNAME,
+            password: process.env.RDS_PASSWORD,
+            port: process.env.RDS_PORT,
+            database: process.env.RDS_DATABASE
+        });
+    }
     
     const { httpMethod, path } = event;
     try {
@@ -34,15 +45,6 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         badRequest.reason = exception.message;
         return badRequest;
     }
-    
-    connection.createConnection({
-        connectionLimit: 10,
-        host: process.env.RDS_HOSTNAME,
-        user: process.env.RDS_USERNAME,
-        password: process.env.RDS_PASSWORD,
-        port: process.env.RDS_PORT,
-        database: process.env.RDS_DATABASE
-    });
     
     if (connection.state === 'disconnected') {
         try {
