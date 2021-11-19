@@ -116,4 +116,5 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
         }
     }
     connection.end();
+    return response;
 }
