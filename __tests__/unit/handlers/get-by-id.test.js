@@ -5,7 +5,7 @@ const dynamodb = require('aws-sdk/clients/dynamodb');
 const lambda = require('../../../src/handlers/get-by-id.js');
 
 // This includes all tests for getByIdHandler
-describe('Test getByIdHandler', () => {
+describe.skip('Test getByIdHandler', () => {
     let getSpy;
 
     // One-time setup and teardown, see more in https://jestjs.io/docs/en/setup-teardown
