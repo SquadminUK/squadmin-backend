@@ -85,7 +85,7 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
         var formattedInvitationsQuery = mysql.format(getInvitations, gameId);
 
         try {
-            var getGameByIdQuery = await connection.query('formattedGetGameQuery; formattedInvitationsQuery', function (err, results, fields) {
+            var getGameByIdQuery = await connection.query(`${formattedGetGameQuery}; ${formattedInvitationsQuery}`, function (err, results, fields) {
             // var getGameByIdQuery = await connection.query(options, function (err, results, fields) {
                 connection.end();
                 if (err) {
