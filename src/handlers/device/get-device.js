@@ -100,6 +100,8 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
         
     }
     
-    return JSON.stringify(response);
+
+    response.body = JSON.stringify(response.body);
+    return response;
     
 }

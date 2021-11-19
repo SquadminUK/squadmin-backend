@@ -68,8 +68,8 @@ jest.mock('mysql', () => ({
                     }
                 }
             }
-        
-            expect(result).toEqual(JSON.stringify(expectedResult));
+            expectedResult.body = JSON.stringify(expectedResult.body);
+            expect(result).toEqual(expectedResult);
         });
 
         it('should return an appropriate message when no devices found', async () => {
