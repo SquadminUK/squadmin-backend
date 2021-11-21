@@ -20,13 +20,27 @@ jest.mock('mysql', () => ({
     describe('Test getDeviceHandler', () => {
         
         beforeEach( () => jest.resetModules() );
+
+        // test('the data is peanut butter', done => {
+        //     function callback(data) {
+        //       try {
+        //         expect(data).toBe('peanut butter');
+        //         done();
+        //       } catch (error) {
+        //         done(error);
+        //       }
+        //     }
+          
+        //     callback('peanut butter');
+        //   });
         
-        it('should throw an error and return that in a response when failing to connect', async () => {
+        it('should throw an error and return that in a response when failing to connect', async done => {
             
             // mysql.connect = jest.fn().mockImplementation((error) => error('error'));
-            mysql.connect = jest.fn().mockImplementation( (error) => {
-                error('error').rejects();
-            })
+            mysql.connect = jest.fn().mockImplementation( (callback) => {
+                callback('error').rejects();
+                done();
+            });
             
             event = {
                 httpMethod: 'GET',
@@ -41,12 +55,13 @@ jest.mock('mysql', () => ({
             }
             
             expect(result).toEqual(expectedResult);
+            done();
         });
         
-        it('should get device details', async () => {
+        it('should get device details', async done => {
         
-            mysql.connect = jest.fn().mockImplementation((error) => {
-                Promise.resolve(jest.fn())
+            mysql.connect = jest.fn().mockImplementation((callback) => {
+                callback();
             })
 
             event = {
@@ -75,11 +90,15 @@ jest.mock('mysql', () => ({
             }
             expectedResult.body = JSON.stringify(expectedResult.body);
             expect(result).toEqual(expectedResult);
+            done();
         });
 
-        it('should return an appropriate message when no devices found', async () => {
+        it('should return an appropriate message when no devices found', async done => {
+            mysql.connect = jest.fn().mockImplementation((callback) => {
+                callback();
+                done();
+            })
             mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []))
-
             event = {
                 httpMethod: 'GET',
                 pathParameters: {
@@ -96,9 +115,10 @@ jest.mock('mysql', () => ({
             };
 
             expect(result).toEqual(expectedResult);
+            done();
         });
 
-        it('should not accept the PUT http method', async () => {
+        it('should not accept the PUT http method', async done => {
             event = {
                 httpMethod: 'PUT',
                 path: 'device_id'
@@ -108,6 +128,7 @@ jest.mock('mysql', () => ({
             const expectedResult = {"message": "Bad request", "reason": "getDeviceHandler only accepts GET method, you tried: PUT", "statusCode": 400}
 
             expect(result).toEqual(expectedResult);
+            done();
         });
         
     });
