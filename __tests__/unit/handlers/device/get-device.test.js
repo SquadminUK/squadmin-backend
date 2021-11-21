@@ -20,19 +20,6 @@ jest.mock('mysql', () => ({
     describe('Test getDeviceHandler', () => {
         
         beforeEach( () => jest.resetModules() );
-
-        // test('the data is peanut butter', done => {
-        //     function callback(data) {
-        //       try {
-        //         expect(data).toBe('peanut butter');
-        //         done();
-        //       } catch (error) {
-        //         done(error);
-        //       }
-        //     }
-          
-        //     callback('peanut butter');
-        //   });
         
         it('should throw an error and return that in a response when failing to connect', async done => {
             
