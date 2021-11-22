@@ -164,7 +164,7 @@ Resources:
       Handler: src/handlers/device/post-device.postDeviceHandler
       Runtime: nodejs14.x
       MemorySize: 128
-      Description: A function used to insert a users' device details for the user
+      Description: A function used to insert a users' device details
       Environment:
         Variables:
           RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
@@ -178,6 +178,28 @@ Resources:
           Properties:
             Path: /device/{user_id}
             Method: POST
+
+  putDeviceByUserIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/device/put-device.putDeviceHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Description: A function used to update a users' device details
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /device/{user_id}
+            Method: PUT
 
   # DynamoDB table to store item: {id: <ID>, name: <NAME>}
   SampleTable:
