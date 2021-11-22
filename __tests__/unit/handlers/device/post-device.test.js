@@ -30,7 +30,7 @@ describe('Test postDeviceHandler', () => {
         expect(result).toEqual(expectedResult);
     });
 
-    it('should not accept the GET http method', async () => {
+    it('should not accept the GET http method', async done => {
         event = {
             httpMethod: 'GET',
             path: 'user_id'
@@ -45,9 +45,10 @@ describe('Test postDeviceHandler', () => {
         };
 
         expect(result).toEqual(expectedResult);
+        done();
     });
 
-    it('should error when no userId provided in path and attempting to create device details', async () => {
+    it('should error when no userId provided in path and attempting to create device details', async done => {
         event = {
             httpMethod: 'POST'
         };
@@ -61,9 +62,10 @@ describe('Test postDeviceHandler', () => {
         };
 
         expect(result).toEqual(expectedResult);
+        done();
     });
 
-    it('should successfully insert device details', async () => {
+    it('should successfully insert device details', async done => {
 
         event = {
             httpMethod: 'POST',
@@ -93,5 +95,6 @@ describe('Test postDeviceHandler', () => {
         };
 
         expect(result).toEqual(expectedResult);
+        done();
     });
 });
