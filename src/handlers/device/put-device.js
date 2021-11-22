@@ -1,16 +1,18 @@
 const mysql = require('mysql');
 
 exports.putDeviceHandler = async (event, context, callback, connection) => {
-
+    
     var response = {
         statusCode: 200,
-        results: {
-            device_id: '',
-            device_make: '',
-            device_model: '',
-            ios_push_notification_token: '',
-            android_push_notification_token: '',
-            date_created: ''
+        body: {
+            results: {
+                device_id: '',
+                device_make: '',
+                device_model: '',
+                ios_push_notification_token: '',
+                android_push_notification_token: '',
+                date_created: ''
+            }
         }
     }
     
@@ -19,67 +21,94 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
         message: "Bad request",
         reason: null
     };
+
+    var userId = '';
     
-    const { httpMethod, path } = event;
+    if (connection === undefined) {
+        connection = mysql.createConnection({
+            connectionLimit: 10,
+            host: process.env.RDS_HOSTNAME,
+            user: process.env.RDS_USERNAME,
+            password: process.env.RDS_PASSWORD,
+            port: process.env.RDS_PORT,
+            database: process.env.RDS_DATABASE
+        });
+    }
+    
     try {
+        const { httpMethod } = event;
+        userId = event.pathParameters.user_id;
+        
         if (httpMethod !== 'PUT') {
             throw new Error(`putDeviceHandler only accepts PUT method, you tried: ${httpMethod}`);
         }
         
-        if (path === undefined || path === '') {
+        if (userId === undefined || userId === '') {
             throw new Error('No user id provided');
         }
     } catch(exception) {
-        badRequest.reason = exception.message;
+        if (exception.message === "Cannot read properties of undefined (reading 'user_id')") {
+            badRequest.reason = "No user id provided";
+        } else {
+            badRequest.reason = exception.message;
+        }
         return badRequest;
     }
-
-    connection.createConnection({
-        connectionLimit: 10,
-        host: process.env.RDS_HOSTNAME,
-        user: process.env.RDS_USERNAME,
-        password: process.env.RDS_PASSWORD,
-        port: process.env.RDS_PORT,
-        database: process.env.RDS_DATABASE
-    });
-
-    if (connection.state === 'disconnected') {
-        try {
-            await connection.connect(function (err) {
-                if (err) {
-                    throw new Error();
-                }
+    
+    try {
+        if (connection.state === 'disconnected') {
+            
+            await new Promise((resolve, reject) => {
+                connection.connect(function (err) {
+                    if (err) {
+                        throw new Error('Failed to connect');
+                        reject();
+                    }
+                    resolve();
+                });
             });
-        } catch (exception) {
-            response = badRequest;
-            response.reason = "Failed to connect";
-            return response;
-        }
-        
-        var updateDeviceSql = "UPDATE UserDevice SET device_id = ?, device_make = ?, device_model = ?, ios_push_notification = ?, android_push_notification = ?) WHERE user_id = ?";
-        var userIdParams = [event.body.device_id, event.body.device_make, event.body.device_model, event.body.ios_push_notification_token, event.body.android_push_notification_token, path];
-        var formattedInsertDeviceQuery = mysql.format(updateDeviceSql, userIdParams);
-        
-        try {
-            var insertDeviceQuery = await connection.query(formattedInsertDeviceQuery, function (err, results) {
-                if (err) {
-                    new Error('There was an issue with the update device SQL statement');
-                }
+            
+            try {
+                var updateDeviceSql = "UPDATE UserDevice SET device_id = ?, device_make = ?, device_model = ?, ios_push_notification_token = ?, android_push_notification_token = ?) WHERE user_id = ?";
+                var userIdParams = [event.body.device_id, event.body.device_make, event.body.device_model, event.body.ios_push_notification_token, event.body.android_push_notification_token, userId];
+                var formattedInsertDeviceQuery = mysql.format(updateDeviceSql, userIdParams);
                 
-                response.results.device_id = event.body.device_id;
-                response.results.device_make = event.body.device_make;
-                response.results.device_model = event.body.device_model;
-                response.results.ios_push_notification_token = event.body.ios_push_notification_token;
-                response.results.android_push_notification_token = event.body.android_push_notification_token;
-                response.results.date_created = event.body.date_created;
                 
+                var insertDeviceQuery = await new Promise((resolve, reject) => {
+                    connection.query(formattedInsertDeviceQuery, function (err, results) {
+                        if (err) {
+                            new Error('There was an issue with the update device SQL statement');
+                            reject();
+                        }
+                        
+                        response.body.results.device_id = event.body.device_id;
+                        response.body.results.device_make = event.body.device_make;
+                        response.body.results.device_model = event.body.device_model;
+                        response.body.results.ios_push_notification_token = event.body.ios_push_notification_token;
+                        response.body.results.android_push_notification_token = event.body.android_push_notification_token;
+                        response.body.results.date_created = event.body.date_created;
+                        
+                        connection.end();
+                        resolve();
+                    }); 
+                });
+            } catch (exception) {
                 connection.end();
-            });
-        } catch (exception) {
-            badRequest.message = exception.message;
-            return badRequest;
+                badRequest.message = exception.message;
+                return badRequest;
+            }
+            
+            
+            
         }
+    } catch (exception) {
+        connection.end();
+        badRequest.message = exception.message;
+        return badRequest;
     }
     
+    
+    
+    response.body = JSON.stringify(response.body);
     return response;
 }
