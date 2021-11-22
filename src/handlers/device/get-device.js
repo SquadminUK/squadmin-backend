@@ -93,6 +93,7 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
                     });
                 });
             } catch(exception) {
+                connection.end();
                 noDeviceFound.message = exception.message;
                 return noDeviceFound;
             }

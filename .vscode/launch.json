@@ -3,6 +3,41 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:postDeviceByIdFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "postDeviceByIdFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "POST",
+                        "pathParameters": {
+                            "user_id": "8490d64f-5c06-4c49-9f8b-89809eb45186",
+                        },
+                        "body": {
+                            "device_id": "48d7cd6a-b815-4c4f-b500-a27fd40c1fcf",
+                            "device_make": "API Make",
+                            "device_model": "API Model",
+                            "ios_push_notification_token": "API iOS Push",
+                            "android_push_notification_token": "API Android Push",
+                            "date_created": "2021-11-22"
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:getDeviceByIdFunction",
             "invokeTarget": {
                 "target": "template",
@@ -40,9 +75,7 @@
                 "path": "/{id}",
                 "httpMethod": "get",
                 "payload": {
-                    "json": {
-                        
-                    }
+                    "json": {}
                 }
             }
         },
