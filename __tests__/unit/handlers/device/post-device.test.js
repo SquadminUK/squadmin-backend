@@ -16,7 +16,9 @@ describe('Test postDeviceHandler', () => {
     it('should not accept the PUT http method', async () => {
         event = {
             httpMethod: 'PUT',
-            path: 'user_id'
+            pathParameters: {
+                user_id: "user_id"
+            },
         };
 
         const result = await lambda.postDeviceHandler(event, context, callback, mysql);
@@ -33,7 +35,9 @@ describe('Test postDeviceHandler', () => {
     it('should not accept the GET http method', async done => {
         event = {
             httpMethod: 'GET',
-            path: 'user_id'
+            pathParameters: {
+                user_id: "user_id"
+            },
         };
 
         const result = await lambda.postDeviceHandler(event, context, callback, mysql);
@@ -67,9 +71,15 @@ describe('Test postDeviceHandler', () => {
 
     it('should successfully insert device details', async done => {
 
+        mysql.connect = jest.fn().mockImplementation((callback) => {
+            callback();
+        })
+
         event = {
             httpMethod: 'POST',
-            path: 'user_id',
+            pathParameters: {
+                user_id: "user_id"
+            },
             body: {
                 device_id: 'device_id',
                 device_make: 'device_make',
@@ -84,16 +94,19 @@ describe('Test postDeviceHandler', () => {
 
         const expectedResult = {
             statusCode: 201,
-            results: {
-                device_id: 'device_id',
-                device_make: 'device_make',
-                device_model: 'device_model',
-                ios_push_notification_token: 'ios_push',
-                android_push_notification_token: '',
-                date_created: 'date'
+            body: {
+                results: {
+                    device_id: 'device_id',
+                    device_make: 'device_make',
+                    device_model: 'device_model',
+                    ios_push_notification_token: 'ios_push',
+                    android_push_notification_token: '',
+                    date_created: 'date'
+                }   
             }
         };
 
+        expectedResult.body = JSON.stringify(expectedResult.body);
         expect(result).toEqual(expectedResult);
         done();
     });

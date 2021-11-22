@@ -34,8 +34,9 @@ exports.postDeviceHandler = async (event, context, callback, connection) => {
     }
     
     const { httpMethod } = event;
-    const userId = event.pathParameters.user_id;
+    
     try {
+        const userId = event.pathParameters.user_id;
         if (httpMethod !== 'POST') {
             throw new Error(`postDeviceHandler only accepts POST method, you tried: ${httpMethod}`);
         }
@@ -44,7 +45,11 @@ exports.postDeviceHandler = async (event, context, callback, connection) => {
             throw new Error('No user id provided');
         }
     } catch(exception) {
-        badRequest.reason = exception.message;
+        if (exception.message === "Cannot read properties of undefined (reading 'user_id')") {
+            badRequest.reason = "No user id provided";
+        } else {
+            badRequest.reason = exception.message;
+        }
         return badRequest;
     }
     
