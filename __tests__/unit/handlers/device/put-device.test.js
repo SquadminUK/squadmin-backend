@@ -23,7 +23,7 @@ describe('Test putDeviceHandler', () => {
         event = {
             httpMethod: 'GET',
             pathParameters: {
-                user_id: ''
+                user_id: 'user_id'
             }
         };
 
