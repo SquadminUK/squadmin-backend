@@ -45,7 +45,7 @@ exports.postDeviceHandler = async (event, context, callback, connection) => {
             throw new Error('No user id provided');
         }
     } catch(exception) {
-        if (exception.message === "Cannot read properties of undefined (reading 'user_id')") {
+        if (exception.message === "Cannot read property 'user_id' of undefined") {
             badRequest.reason = "No user id provided";
         } else {
             badRequest.reason = exception.message;
