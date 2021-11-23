@@ -37,13 +37,47 @@ describe('Test getUserHandler', () => {
         done();
     });
 
-    // it('should not accept POST method', async done => {
+    it('should not accept POST method', async done => {
+        event = {
+            httpMethod: 'POST',
+            pathParameters: {
+                user_id: 'user_id'
+            }
+        };
 
-    //     done();
-    // });
+        const result = await lambda.getUserHandler(event, context, callback, mysql);
 
-    // it('should fail with a suitable error when no user_id provided', async done => {
+        const expectedResult = {
+            statusCode: 400,
+            message: 'Bad request',
+            reason: 'getDeviceHandler only accepts GET method, you tried: POST'
+        }
 
-    //     done();
-    // });
+        expect(result).toEqual(expectedResult);
+
+        done();
+    });
+
+    it('should fail with a suitable error when no user_id provided', async done => {
+    
+        event = {
+            httpMethod: 'GET',
+            pathParameters: {
+                user_id: ''
+            }
+        };
+
+        const result = await lambda.getUserHandler(event, context, callback, mysql);
+
+            const expectedResult = {
+                "message": "Bad request",
+                "reason": "No user id provided",
+                "statusCode": 400
+            };
+    
+            expect(result).toEqual(expectedResult);
+    
+            done();
+    });
+    
 });

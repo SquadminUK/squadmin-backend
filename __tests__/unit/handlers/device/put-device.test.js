@@ -62,6 +62,9 @@ describe('Test putDeviceHandler', () => {
     it('should error when no userId provided in path and attempting to update device details', async done => {
         event = {
             httpMethod: 'PUT',
+            pathParameters: {
+                user_id: ''
+            }
         };
 
         const result = await lambda.putDeviceHandler(event, context, callback, mysql);
