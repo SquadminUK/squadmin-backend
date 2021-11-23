@@ -41,7 +41,7 @@ describe('Test getUserHandler', () => {
         const expectedResult = {
             statusCode: 400,
             message: 'Bad request',
-            reason: 'getDeviceHandler only accepts GET method, you tried: PUT'
+            reason: 'getUserHandler only accepts GET method, you tried: PUT'
         }
         
         expect(result).toEqual(expectedResult);
@@ -62,7 +62,7 @@ describe('Test getUserHandler', () => {
         const expectedResult = {
             statusCode: 400,
             message: 'Bad request',
-            reason: 'getDeviceHandler only accepts GET method, you tried: POST'
+            reason: 'getUserHandler only accepts GET method, you tried: POST'
         }
         
         expect(result).toEqual(expectedResult);

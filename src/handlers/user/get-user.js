@@ -48,7 +48,7 @@ exports.getUserHandler = async (event, context, callback, connection) => {
         const userId = event.pathParameters.user_id;
 
         if (httpMethod != 'GET') {
-            throw new Error(`getDeviceHandler only accepts GET method, you tried: ${httpMethod}`);
+            throw new Error(`getUserHandler only accepts GET method, you tried: ${httpMethod}`);
         }
         
         if (userId === undefined || userId === '') {
