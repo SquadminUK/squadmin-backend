@@ -82,9 +82,8 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                             new Error('There was an issue with the SQL statement');
                             reject();
                         }
-                    });
-                    
-                    var user;
+
+                        var user;
                     if (results.length > 0) {
                         user = results[0];
                         reject('No users found');
@@ -107,7 +106,9 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                     }
                     connection.end();
                     resolve();
-                })
+                    });
+                    
+                });
                 
             } catch (exception) {
                 connection.end();
