@@ -5,7 +5,8 @@
     "private": true,
     "dependencies": {
         "aws-sdk": "^2.660.0",
-        "mysql": "2.18.1"
+        "mysql": "2.18.1",
+        "salted-sha256": "1.0.0"
     },
     "devDependencies": {
         "jest": "^25.4.0"

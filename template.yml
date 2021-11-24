@@ -201,6 +201,73 @@ Resources:
             Path: /device/{user_id}
             Method: PUT
 
+  putUserByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/user/put-user.putUserHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Description: A function used to update a users' details
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /user/{user_id}
+            Method: PUT
+
+  postUserByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/user/post-user.postUserHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Description: A function used to create a user for Social login and regular account creation
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+          HASHING_SALT: 'SquadminApp'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /user/
+            Method: POST
+
+  getUserByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/user/get-user.getUserHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Description: A function used to get a users' details
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /user/{user_id}
+            Method: GET
+
   # DynamoDB table to store item: {id: <ID>, name: <NAME>}
   SampleTable:
     Type: AWS::Serverless::SimpleTable
