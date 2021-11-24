@@ -72,27 +72,25 @@ exports.putUserHandler = async (event, context, callback, connection) => {
                 })
             });
             
-            try {
-                var getUserSql = "UPDATE User SET full_name = ?, email_address = ?, mobile_number = ?, date_of_birth = ?, date_modified = ? WHERE user_id = ?";
+             try {
+                var putUserSql = "UPDATE User SET full_name = ?, email_address = ?, mobile_number = ?, date_of_birth = ?, date_modified = ? WHERE user_id = ?";
                 var userId = [event.body.full_name, event.body.email_address, event.body.mobile_number, event.body.date_of_birth, event.body.date_modified, userId];
-                var formattedUpdateUserQuery = mysql.format(getUserSql, userId);
-                
-                await new Promise((reject, resolve) => {
-                    connection.query(formattedUpdateUserQuery, function(err, results) {
+                var formattedUpdateUserQuery = mysql.format(putUserSql, userId);
+
+                var updateUserQuery = await new Promise((resolve, reject) => {
+                    connection.query(formattedUpdateUserQuery, function (err, results) {
                         if (err) {
-                            new Error('There was an issue with the SQL statement');
+                            new Error('There was an issue with the update user SQL statement');
                             reject();
                         }
-                        
+
                         response.body.results = event.body;
-                        
                         connection.end();
                         resolve();
                     });
-                    
                 });
-                
-            } catch (exception) {
+            } 
+            catch (exception) {
                 connection.end();
                 badRequest.reason = exception.message;
                 return badRequest;

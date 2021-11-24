@@ -1,5 +1,5 @@
-const lambda = require('../../../../src/handlers/user/put-user');
 const mysql = require('mysql');
+const lambda = require('../../../../src/handlers/user/put-user');
 
 var event, context, callback;
 
@@ -92,22 +92,22 @@ describe('Test putUserHandler', () => {
         done();
     });
     
-    it('should successfully update user details', async done => {
+    it('should successfully retrieve user details', async done => {
         
         mysql.connect = jest.fn().mockImplementation((callback) => callback());
-        // mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
-        //     {
-        //         user_id: 'user_id',
-        //         full_name: 'full_name',
-        //         email_address: 'email_address',
-        //         mobile_number: 'mobile_number',
-        //         username: 'username',
-        //         date_of_birth: 'date_of_birth',
-        //         date_created: 'date_created',
-        //         date_modified: 'date_modified',
-        //         signed_up_via_social: true
-        //     }
-        // ]));
+        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
+            {
+                user_id: 'user_id',
+                full_name: 'full_name',
+                email_address: 'email_address',
+                mobile_number: 'mobile_number',
+                username: 'username',
+                date_of_birth: 'date_of_birth',
+                date_created: 'date_created',
+                date_modified: 'date_modified',
+                signed_up_via_social: true
+            }
+        ])),
 
         event = {
             httpMethod: 'PUT',
