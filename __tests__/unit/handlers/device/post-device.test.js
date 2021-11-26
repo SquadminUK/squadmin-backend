@@ -54,7 +54,10 @@ describe('Test postDeviceHandler', () => {
 
     it('should error when no userId provided in path and attempting to create device details', async done => {
         event = {
-            httpMethod: 'POST'
+            httpMethod: 'POST',
+            pathParameters: {
+                user_id: ''
+            }
         };
 
         const result = await lambda.postDeviceHandler(event, context, callback, mysql);

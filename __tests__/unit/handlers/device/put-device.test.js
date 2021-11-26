@@ -1,4 +1,3 @@
-const { IoT1ClickDevicesService } = require('aws-sdk');
 const mysql = require('mysql');
 const lambda = require('../../../../src/handlers/device/put-device');
 
@@ -18,6 +17,8 @@ jest.mock('mysql', () => ({
     }));
 
 describe('Test putDeviceHandler', () => {
+
+    beforeEach( () => jest.resetModules() );
     
     it('should not accept the GET http method', async done => {
         event = {
@@ -62,6 +63,9 @@ describe('Test putDeviceHandler', () => {
     it('should error when no userId provided in path and attempting to update device details', async done => {
         event = {
             httpMethod: 'PUT',
+            pathParameters: {
+                user_id: ''
+            }
         };
 
         const result = await lambda.putDeviceHandler(event, context, callback, mysql);
@@ -80,7 +84,7 @@ describe('Test putDeviceHandler', () => {
 
         mysql.connect = jest.fn().mockImplementation((callback) => {
             callback();
-        })
+        });
 
         event = {
             httpMethod: 'PUT',
