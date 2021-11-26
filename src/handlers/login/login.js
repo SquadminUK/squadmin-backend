@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 
-exports.getUserHandler = async (event, context, callback, connection) => {
+exports.postLoginHandler = async (event, context, callback, connection) => {
+    
     var response = {
         statusCode: 200,
         body: {
@@ -9,27 +10,20 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                 full_name: '',
                 email_address: '',
                 mobile_number: '',
+                password: '',
                 username: '',
                 date_of_birth: '',
                 date_created: '',
                 date_modified: '',
-                signed_up_via_social: ''
+                signed_up_via_social: true
             }
         }
-    }
+    };
     
     var badRequest = {
         statusCode: 400,
-        message: 'Bad request',
+        message: "Bad request",
         reason: null
-    };
-    
-    var noUserFound = {
-        statusCode: 200,
-        body: {
-            results: [],
-            message: ''
-        } 
     };
     
     if (connection === undefined) {
@@ -43,16 +37,10 @@ exports.getUserHandler = async (event, context, callback, connection) => {
         });
     }
     
+    const { httpMethod } = event;
     try {
-        const { httpMethod } = event;
-        const userId = event.pathParameters.user_id;
-        
-        if (httpMethod != 'GET') {
-            throw new Error(`getUserHandler only accepts GET method, you tried: ${httpMethod}`);
-        }
-        
-        if (userId === undefined || userId === '') {
-            throw new Error('No user id provided');
+        if (httpMethod !== 'POST') {
+            throw new Error(`postLoginHandler only accepts POST method, you tried: ${httpMethod}`);
         }
     } catch (exception) {
         badRequest.reason = exception.message;
@@ -69,58 +57,54 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                     }
                     resolve();
                 })
-            });
+            })
             
-            try {
+            try { 
                 var getUserSql = "SELECT * FROM User WHERE user_id = ?";
-                var userId = event.pathParameters.user_id;
-                var formattedGetUserQuery = mysql.format(getUserSql, userId);
+                var userParams = event.body.user_id;
+                var formattedGetUserQuery = mysql.format(getUserSql, userParams);
                 
-                await new Promise((reject, resolve) => {
+                await new Promise((resolve, reject) => {
                     connection.query(formattedGetUserQuery, function(err, results) {
                         if (err) {
                             new Error('There was an issue with the SQL statement');
                             reject();
                         }
                         
-                        var user;
-                        if (results.length > 0) {
-                            user = results[0];
-                            reject('No users found');
+                        var userSubmittedPassword = event.body.password;
+                        var retrievedUser = results[0];
+                        if (retrievedUser.password === userSubmittedPassword) {
+                            response.body.results.user_id = retrievedUser.user_id;
+                            response.body.results.full_name = retrievedUser.full_name;
+                            response.body.results.email_address = retrievedUser.email_address;
+                            response.body.results.mobile_number = retrievedUser.mobile_number;
+                            response.body.results.password = retrievedUser.password;
+                            response.body.results.username = retrievedUser.username;
+                            response.body.results.date_of_birth = retrievedUser.date_of_birth;
+                            response.body.results.date_created = retrievedUser.date_created;
+                            response.body.results.date_modified = retrievedUser.date_modified;
+                            response.body.results.signed_up_via_social = retrievedUser.signed_up_via_social;
                         } else {
-                            throw new Error('No users found');
-                        }
-                        
-                        if (user) {
-                            
-                            response.body.results.user_id = user.user_id;
-                            response.body.results.full_name = user.full_name;
-                            response.body.results.email_address = user.email_address;
-                            response.body.results.mobile_number = user.mobile_number;
-                            response.body.results.username = user.username;
-                            response.body.results.date_of_birth = user.date_of_birth;
-                            response.body.results.date_created = user.date_created;
-                            response.body.results.date_modified = user.date_modified;
-                            response.body.results.signed_up_via_social = user.signed_up_via_social;
-                            
+                            response = badRequest;
+                            response.reason = "Failed to login";
+                            throw new Error('Failed to login');
                         }
                         connection.end();
                         resolve();
                     });
-                    
                 });
-                
             } catch (exception) {
                 connection.end();
-                badRequest.reason = exception.message;
-                return badRequest;
+                response = badRequest;
+                response.reason = exception.message;
+                return response;
             }
             
         }
     } catch (exception) {
         connection.end();
         response = badRequest;
-        response.reason = exception.message;
+        response.reason = "Failed to connect";
         return response;
     }
     
