@@ -105,7 +105,7 @@ describe('Test getInvitationHandler', () => {
                 user_id: 'user_id'
             }
         ])),
-
+        
         event = {
             httpMethod: 'GET',
             pathParameters: {
@@ -120,17 +120,17 @@ describe('Test getInvitationHandler', () => {
             body: {
                 results: {
                     response_id: 'response_id',
-                date_responded: 'date_responded',
-                can_play: true,
-                date_modified: 'date_modified',
-                organised_game_id: 'organised_game_id',
-                user_id: 'user_id'
+                    date_responded: 'date_responded',
+                    can_play: true,
+                    date_modified: 'date_modified',
+                    organised_game_id: 'organised_game_id',
+                    user_id: 'user_id'
                 }
             }
         }
         
         expectedResult.body = JSON.stringify(expectedResult.body);
-
+        
         expect(result).toEqual(expectedResult);
         done();
     });

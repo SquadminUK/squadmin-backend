@@ -46,7 +46,7 @@ exports.getUserHandler = async (event, context, callback, connection) => {
     try {
         const { httpMethod } = event;
         const userId = event.pathParameters.user_id;
-
+        
         if (httpMethod != 'GET') {
             throw new Error(`getUserHandler only accepts GET method, you tried: ${httpMethod}`);
         }
@@ -82,30 +82,30 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                             new Error('There was an issue with the SQL statement');
                             reject();
                         }
-
+                        
                         var user;
-                    if (results.length > 0) {
-                        user = results[0];
-                        reject('No users found');
-                    } else {
-                        throw new Error('No users found');
-                    }
-                    
-                    if (user) {
+                        if (results.length > 0) {
+                            user = results[0];
+                            reject('No users found');
+                        } else {
+                            throw new Error('No users found');
+                        }
                         
-                        response.body.results.user_id = user.user_id;
-                        response.body.results.full_name = user.full_name;
-                        response.body.results.email_address = user.email_address;
-                        response.body.results.mobile_number = user.mobile_number;
-                        response.body.results.username = user.username;
-                        response.body.results.date_of_birth = user.date_of_birth;
-                        response.body.results.date_created = user.date_created;
-                        response.body.results.date_modified = user.date_modified;
-                        response.body.results.signed_up_via_social = user.signed_up_via_social;
-                        
-                    }
-                    connection.end();
-                    resolve();
+                        if (user) {
+                            
+                            response.body.results.user_id = user.user_id;
+                            response.body.results.full_name = user.full_name;
+                            response.body.results.email_address = user.email_address;
+                            response.body.results.mobile_number = user.mobile_number;
+                            response.body.results.username = user.username;
+                            response.body.results.date_of_birth = user.date_of_birth;
+                            response.body.results.date_created = user.date_created;
+                            response.body.results.date_modified = user.date_modified;
+                            response.body.results.signed_up_via_social = user.signed_up_via_social;
+                            
+                        }
+                        connection.end();
+                        resolve();
                     });
                     
                 });
