@@ -73,7 +73,7 @@ describe('Test getInvitationHandler', () => {
     it('should fail with a suitable error when no response_id provided', async done => {
         
         event = {
-            httpMethod: 'PUT',
+            httpMethod: 'GET',
             pathParameters: {
                 response_id: ''
             }
@@ -97,19 +97,19 @@ describe('Test getInvitationHandler', () => {
         mysql.connect = jest.fn().mockImplementation((callback) => callback());
         mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
             {
-                // response_id:
-                // date_responded: 
-                // can_play:
-                // date_modified:
-                // organised_game_id:
-                // user_id:
+                response_id: 'response_id',
+                date_responded: 'date_responded',
+                can_play: true,
+                date_modified: 'date_modified',
+                organised_game_id: 'organised_game_id',
+                user_id: 'user_id'
             }
         ])),
 
         event = {
             httpMethod: 'GET',
             pathParameters: {
-                response_id: 'response_id'
+                invitation_id: 'response_id'
             }
         };
         
@@ -120,8 +120,11 @@ describe('Test getInvitationHandler', () => {
             body: {
                 results: {
                     response_id: 'response_id',
-                    can_play: true,
-                    date_modified: 'date_modified'
+                date_responded: 'date_responded',
+                can_play: true,
+                date_modified: 'date_modified',
+                organised_game_id: 'organised_game_id',
+                user_id: 'user_id'
                 }
             }
         }

@@ -14,7 +14,7 @@
                     "json": {
                         "httpMethod": "POST",
                         "pathParameters": {
-                            "user_id": "8490d64f-5c06-4c49-9f8b-89809eb45186",
+                            "user_id": "8490d64f-5c06-4c49-9f8b-89809eb45186"
                         },
                         "body": {
                             "device_id": "48d7cd6a-b815-4c4f-b500-a27fd40c1fcf",
