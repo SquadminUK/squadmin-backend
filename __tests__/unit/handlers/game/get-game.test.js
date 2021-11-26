@@ -18,7 +18,10 @@ describe('Test getGameHandler', () => {
 
     it('should not accept the POST http method', async () => {
         event = {
-            httpMethod: 'POST'
+            httpMethod: 'POST',
+            pathParameters: {
+                id: ''
+            }
         };
 
         const result = await lambda.getGameByIdHandler(event, context, callback, mysql);
@@ -34,7 +37,10 @@ describe('Test getGameHandler', () => {
 
     it('should not accept the PUT http method', async () => {
         event = {
-            httpMethod: 'PUT'
+            httpMethod: 'PUT',
+            pathParameters: {
+                id: ''
+            }
         };
 
         const result = await lambda.getGameByIdHandler(event, context, callback, mysql);
@@ -50,7 +56,10 @@ describe('Test getGameHandler', () => {
 
     it('should error when no gameid provided in path', async() => {
         event = {
-            httpMethod: 'GET'
+            httpMethod: 'GET',
+            pathParameters: {
+                id: ''
+            }
         };
 
         const result = await lambda.getGameByIdHandler(event, context, callback, mysql);
