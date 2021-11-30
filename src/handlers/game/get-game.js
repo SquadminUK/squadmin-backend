@@ -30,7 +30,7 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
             port: process.env.RDS_PORT,
             database: process.env.RDS_DATABASE,
             multipleStatements: true
-        });;
+        });
     }
     
     var gameId = undefined;
