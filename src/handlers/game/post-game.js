@@ -55,13 +55,14 @@ exports.postGameHandler = async(event, context, callback, connection) => {
 
             try {
                 var allMobileNumbers = [];
-                // // const playersObservable = new Observable()
-                const game = of(event.body.game);
+                
+                const game = from(event.body.game);
                 const invitedPlayers = from(event.body.invitedPlayers);
                 const filteredMobile = invitedPlayers.pipe(filter(invite => invite.mobile_number !== '' || invite.mobile_number !== undefined)).subscribe(invite => {
                     allMobileNumbers.push(invite.mobile_number);
                 });
 
+                const allMobileNumbersSqlPortion = 
                 
                 // Determine which users are registered
                 var nonRegisteredUsersSql = "SELECT * FROM User WHERE mobile_number in";
