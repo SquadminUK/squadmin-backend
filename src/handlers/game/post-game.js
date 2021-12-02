@@ -62,10 +62,17 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                     allMobileNumbers.push(invite.mobile_number);
                 });
 
-                const allMobileNumbersSqlPortion = 
-                
-                // Determine which users are registered
-                var nonRegisteredUsersSql = "SELECT * FROM User WHERE mobile_number in";
+                // work out who isn't registered
+                // 1. mobile numbers registered via app
+
+                // 2. users who aren't registered
+
+                // 2.1 insert ghost record for the non registered users
+
+                // 3. invite those via notification to be determined (email?)
+
+                // 4. 
+
                 // Create ghost record in the user table for non registered users
 
                 // Invite non registered users
