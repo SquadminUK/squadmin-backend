@@ -44,85 +44,6 @@ jest.mock('mysql', () => ({
             expect(result).toEqual(expectedResult);
             done();
         });
-        
-        it('should create and insert a game and the invited players', async done => {
-            
-            event = {
-                httpMethod: 'POST',
-                body: {
-                    game: {
-                        game_id: 'game_id',
-                        venue: 'venue',
-                        location: 'location',
-                        date_created: 'date_created',
-                        date_modified: 'date_modified',
-                        organising_player: 'organising_player'
-                    },
-                    invitedPlayers: [
-                        {
-                            organised_game_id: 'organised_game_id',
-                            response_id: 'response_id',
-                            date_responded: 'date_responded',
-                            can_play: 'can_play',
-                            date_modified: 'date_modified',
-                            user_id: 'user_id',
-                            mobile_number: 'mobile_number 0',
-                            email_address: 'email_address 0'
-                        },
-                        {
-                            organised_game_id: 'organised_game_id',
-                            response_id: 'response_id',
-                            date_responded: 'date_responded',
-                            can_play: 'can_play',
-                            date_modified: 'date_modified',
-                            user_id: 'user_id',
-                            mobile_number: 'mobile_number 1',
-                            email_address: 'email_address 1'
-                        },
-                    ]
-                }
-            }
-
-            const result = await lambda.postGameHandler(event, context, callback, mysql);
-
-            const expectedResult = {
-                statusCode: 201,
-                body: {
-                    results: {
-                        game: {
-                            game_id: 'game_id',
-                            venue: 'venue',
-                            location: 'location',
-                            date_created: 'date_created',
-                            date_modified: 'date_modified',
-                            organising_player: 'organising_player'
-                        },
-                        invitedPlayers: [
-                            {
-                                organised_game_id: 'organised_game_id',
-                                response_id: 'response_id',
-                                date_responded: 'date_responded',
-                                can_play: 'can_play',
-                                date_modified: 'date_modified',
-                                user_id: 'user_id'
-                            },
-                            {
-                                organised_game_id: 'organised_game_id',
-                                response_id: 'response_id',
-                                date_responded: 'date_responded',
-                                can_play: 'can_play',
-                                date_modified: 'date_modified',
-                                user_id: 'user_id'
-                            },
-                        ]
-                    }
-                }
-            }
-
-            expectedResult.body = JSON.stringify(expectedResult.body);
-            expect(result).toEqual(expectedResult);
-
-        });
 
         it('should return an error when any mobile numbers are missing for a player', async done => {
             event = {
@@ -172,4 +93,84 @@ jest.mock('mysql', () => ({
             expect(result).toEqual(expectedResult);
             done();
         });
+        
+        it('should create and insert a game and the invited players', async done => {
+            
+            event = {
+                httpMethod: 'POST',
+                body: {
+                    game: {
+                        game_id: 'game_id',
+                        venue: 'venue',
+                        location: 'location',
+                        date_created: 'date_created',
+                        date_modified: 'date_modified',
+                        organising_player: 'organising_player'
+                    },
+                    invitedPlayers: [
+                        {
+                            organised_game_id: 'organised_game_id',
+                            response_id: 'response_id',
+                            date_responded: 'date_responded',
+                            can_play: 'can_play',
+                            date_modified: 'date_modified',
+                            user_id: 'user_id',
+                            mobile_number: '+44 7931 123 456',
+                            email_address: 'email_address 0'
+                        },
+                        {
+                            organised_game_id: 'organised_game_id',
+                            response_id: 'response_id',
+                            date_responded: 'date_responded',
+                            can_play: 'can_play',
+                            date_modified: 'date_modified',
+                            user_id: 'user_id',
+                            mobile_number: '07931 123456',
+                            email_address: 'email_address 1'
+                        },
+                    ]
+                }
+            }
+
+            const result = await lambda.postGameHandler(event, context, callback, mysql);
+
+            const expectedResult = {
+                statusCode: 201,
+                body: {
+                    results: {
+                        game: {
+                            game_id: 'game_id',
+                            venue: 'venue',
+                            location: 'location',
+                            date_created: 'date_created',
+                            date_modified: 'date_modified',
+                            organising_player: 'organising_player'
+                        },
+                        invitedPlayers: [
+                            {
+                                organised_game_id: 'organised_game_id',
+                                response_id: 'response_id',
+                                date_responded: 'date_responded',
+                                can_play: 'can_play',
+                                date_modified: 'date_modified',
+                                user_id: 'user_id'
+                            },
+                            {
+                                organised_game_id: 'organised_game_id',
+                                response_id: 'response_id',
+                                date_responded: 'date_responded',
+                                can_play: 'can_play',
+                                date_modified: 'date_modified',
+                                user_id: 'user_id'
+                            },
+                        ]
+                    }
+                }
+            }
+
+            expectedResult.body = JSON.stringify(expectedResult.body);
+            expect(result).toEqual(expectedResult);
+
+        });
+
     });

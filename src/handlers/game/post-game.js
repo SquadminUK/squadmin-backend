@@ -1,6 +1,19 @@
 const mysql = require('mysql');
-const { from, of, throwError } = require('rxjs');
-const { filter, count } = require('rxjs/operators');
+const { from, of } = require('rxjs');
+const { filter, count, map } = require('rxjs/operators');
+
+function formattedMobileNumber(mobileNumber) {
+    var unformatted = mobileNumber;
+    unformatted.trim();
+    unformatted = mobileNumber.replaceAll(" ", "");
+    if (unformatted.startsWith("07")) {
+        unformatted = unformatted.replace("07", "+447");
+    } else if (unformatted.startsWith("+44")) {
+        // do nothing
+    }
+
+    return unformatted;
+}
 
 exports.postGameHandler = async(event, context, callback, connection) => {
     
@@ -58,24 +71,30 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                 
                 const game = of(event.body.game);
                 const invitedPlayers = from(event.body.invitedPlayers);
-                const filteredMobile = invitedPlayers.pipe(filter(invite => invite.mobile_number !== '')).subscribe(invite => {
+
+                invitedPlayers.pipe(filter(invite => invite.mobile_number !== '')).subscribe(invite => {
                     allMobileNumbers.push(invite.mobile_number);
                 });
                 
                 var submittedPlayerCount = undefined;
-                var noInvitedPlayers = invitedPlayers.pipe(count()).subscribe(playerCount => {
+                invitedPlayers.pipe(count()).subscribe(playerCount => {
                     submittedPlayerCount = playerCount;
                 });
 
                 if (submittedPlayerCount !== allMobileNumbers.length) {
                     throw new Error('Missing required data');
                 }
-                
-                console.log("hello");
-                
-                // work out who isn't registered
+
                 // 1. mobile numbers registered via app
-                
+                // var registeredUsersSQL = "SELECT * FROM Users WHERE mobile_number IN (";
+                invitedPlayers.pipe(map(invite => invite.mobile_number = formattedMobileNumber(invite.mobile_number))).subscribe(updatedInvite => {
+                    console.log(`${updatedInvite}`);
+                });
+                console.log("hello");
+
+                invitedPlayers.pipe(filter(invite => invite.mobile_number !== '')).subscribe(invite => {
+                    console.log("should hav echagne vlaues");
+                });
                 // 2. users who aren't registered
                 
                 // 2.1 insert ghost record for the non registered users
