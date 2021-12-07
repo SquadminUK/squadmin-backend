@@ -170,7 +170,7 @@ jest.mock('mysql', () => ({
 
             expectedResult.body = JSON.stringify(expectedResult.body);
             expect(result).toEqual(expectedResult);
-
+            done();
         });
 
     });
