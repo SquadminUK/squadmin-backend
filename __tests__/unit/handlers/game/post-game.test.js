@@ -114,7 +114,7 @@ jest.mock('mysql', () => ({
                             date_responded: 'date_responded',
                             can_play: 'can_play',
                             date_modified: 'date_modified',
-                            user_id: 'user_id',
+                            user_id: 'user_id_2',
                             mobile_number: '+44 7931 123 456',
                             email_address: 'email_address 0'
                         },
@@ -124,7 +124,7 @@ jest.mock('mysql', () => ({
                             date_responded: 'date_responded',
                             can_play: 'can_play',
                             date_modified: 'date_modified',
-                            user_id: 'user_id',
+                            user_id: 'user_id_1',
                             mobile_number: '07931 123456',
                             email_address: 'email_address 1'
                         },

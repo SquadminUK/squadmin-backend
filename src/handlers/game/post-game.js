@@ -8,8 +8,6 @@ function formattedMobileNumber(mobileNumber) {
     unformatted = mobileNumber.replaceAll(" ", "");
     if (unformatted.startsWith("07")) {
         unformatted = unformatted.replace("07", "+447");
-    } else if (unformatted.startsWith("+44")) {
-        // do nothing
     }
     
     return unformatted;
@@ -94,13 +92,40 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                 var registeredUsers = undefined;
                 var submittedUserIds = undefined;
                 invitedPlayers.pipe(map(invite => invite.user_id), toArray()).subscribe(userIdArray => {
-                    console.log(`${userIdArray}`);
+                    submittedUserIds = userIdArray;
                 });
 
+                submittedUserIds.forEach(function (value, index, array){
+                    if (index === array.length -1) {
+                        registeredUsersSQL += " ?) AND registered_via_client = true);";
+                    } else {
+                        registeredUsersSQL += "?,"
+                    }
+                });
+
+                registeredUsersSQLFormatted = mysql.format(registeredUsersSQL, submittedUserIds);
+
+                await new Promise((resolve, reject) => {
+                    connection.query(registeredUsersSQLFormatted, function (err, results) {
+                        if (err) {
+                            connection.end();
+                            throw new Error('There was an issue with the SQL Statement');
+                        }
+
+                        registeredUsers = results;
+
+                        if (results.length === event.body.invitedPlayers.length) {
+                            allSubmittedUsersRegistered = true;
+                            resolve();
+                        } else {
+                           allSubmittedUsersRegistered = false;
+                           resolve();
+                        }
+                    });
+                });
 
                 var unregisteredUsers = undefined;
-
-
+                
                 // 2.1 insert ghost record for the non registered users
                 
                 // 3. invite those via notification to be determined (email?)
