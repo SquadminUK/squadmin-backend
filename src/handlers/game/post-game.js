@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const { from, of } = require('rxjs');
-const { filter, count, map } = require('rxjs/operators');
+const { filter, count, map, tap, toArray } = require('rxjs/operators');
 
 function formattedMobileNumber(mobileNumber) {
     var unformatted = mobileNumber;
@@ -11,7 +11,7 @@ function formattedMobileNumber(mobileNumber) {
     } else if (unformatted.startsWith("+44")) {
         // do nothing
     }
-
+    
     return unformatted;
 }
 
@@ -71,7 +71,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                 
                 const game = of(event.body.game);
                 const invitedPlayers = from(event.body.invitedPlayers);
-
+                
                 invitedPlayers.pipe(filter(invite => invite.mobile_number !== '')).subscribe(invite => {
                     allMobileNumbers.push(invite.mobile_number);
                 });
@@ -80,23 +80,27 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                 invitedPlayers.pipe(count()).subscribe(playerCount => {
                     submittedPlayerCount = playerCount;
                 });
-
+                
                 if (submittedPlayerCount !== allMobileNumbers.length) {
                     throw new Error('Missing required data');
                 }
-
+                
                 // 1. mobile numbers registered via app
-                // var registeredUsersSQL = "SELECT * FROM Users WHERE mobile_number IN (";
+                var registeredUsersSQL = "SELECT * FROM Users WHERE mobile_number IN (";
                 invitedPlayers.pipe(map(invite => invite.mobile_number = formattedMobileNumber(invite.mobile_number))).subscribe(updatedInvite => {
                     console.log(`${updatedInvite}`);
                 });
-                console.log("hello");
-
-                invitedPlayers.pipe(filter(invite => invite.mobile_number !== '')).subscribe(invite => {
-                    console.log("should hav echagne vlaues");
-                });
                 // 2. users who aren't registered
-                
+                var registeredUsers = undefined;
+                var submittedUserIds = undefined;
+                invitedPlayers.pipe(map(invite => invite.user_id), toArray()).subscribe(userIdArray => {
+                    console.log(`${userIdArray}`);
+                });
+
+
+                var unregisteredUsers = undefined;
+
+
                 // 2.1 insert ghost record for the non registered users
                 
                 // 3. invite those via notification to be determined (email?)
