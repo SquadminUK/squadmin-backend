@@ -1,4 +1,6 @@
 const mysql = require('mysql');
+const { from, of } = require('rxjs');
+const { map, toArray } = require('rxjs/operators');
 
 exports.getUsersRegistrationStatusHandler = async(event, context, callback, connection) => {
 
@@ -51,7 +53,24 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             });
             
             try {
-                // Implemet SQL Query here.
+                var getUsersSQL = "SELECT * FROM Users WHERE user_id IN (";
+
+                event.body.userIds.forEach(function(value, index, array){
+                        if (index === array.length - 1) {
+                            getUsersSQL += "?) AND has_registered_via_client = true";
+                        } else {
+                            getUsersSQL += "?, ";
+                        }
+                    });
+
+                const formattedQuery = mysql.format(getUsersSqlQuery, event.body.userIds);
+
+                var userStatusQuery = await new Promise((reject, resolve) => {
+                    connection.query(formattedQuery, function(err, results){
+
+                    });
+                });
+
             } catch (exception) {
                 connection.end();
                 response = badRequest;

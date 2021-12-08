@@ -48,7 +48,7 @@ describe('Test getUsersRegistrationStatusHandler', () => {
         done();
     });
     
-    it('should not accept the PUT http method', async () => {
+    it('should not accept the PUT http method', async done => {
         event = {
             httpMethod: 'PUT',
             pathParameters: {
@@ -64,6 +64,32 @@ describe('Test getUsersRegistrationStatusHandler', () => {
             "statusCode": 400
         };
         
+        expect(result).toEqual(expectedResult);
+        done();
+    });
+
+    it('should return empty array when no users found', async done => {
+        mysql.connect = jest.fn().mockImplementation((query, callback) => callback(null, []));
+       
+        event = {
+            httpMethod: 'GET',
+            body: {
+                userIds: ['user_id_1', 'user_id_2']
+            }
+        };
+
+        const result = await lambda.getUsersRegistrationStatusHandler(event, context, callback, connection);
+
+        const expectedResult = {
+            statusCode: 200,
+            body: {
+                results: {
+                    users: []
+                }
+            }
+        };
+        expectedResult.body = JSON.stringify(expectedResult.body);
+
         expect(result).toEqual(expectedResult);
     });
 
