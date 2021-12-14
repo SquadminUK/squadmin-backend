@@ -63,11 +63,21 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
                         }
                     });
 
-                const formattedQuery = mysql.format(getUsersSqlQuery, event.body.userIds);
+                const formattedQuery = mysql.format(getUsersSQL, event.body.userIds);
 
-                var userStatusQuery = await new Promise((reject, resolve) => {
-                    connection.query(formattedQuery, function(err, results){
+                await new Promise((reject, resolve) => {
+                    connection.query(formattedQuery, function(err, results) {
+                        if (err) {
+                            new Error('There was an issue with the SQL Statement');
+                            reject();
+                        }
 
+                        if (results.length > 0) {
+                            for (const user in results) {
+                                response.body.results.users.push(user);
+                            }
+                        }
+                        resolve();
                     });
                 });
 
@@ -84,6 +94,7 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
         return response;
     }
     
+    connection.end();
     response.body = JSON.stringify(response.body);
     return response;
 }

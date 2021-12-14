@@ -86,7 +86,7 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                         var user;
                         if (results.length > 0) {
                             user = results[0];
-                            reject('No users found');
+                            // reject('No users found');
                         } else {
                             throw new Error('No users found');
                         }

@@ -1,4 +1,3 @@
-const { IoT1ClickDevicesService } = require('aws-sdk');
 const mysql = require('mysql');
 const lambda = require('../../../../src/handlers/users/get-registration-status');
 
@@ -69,8 +68,10 @@ describe('Test getUsersRegistrationStatusHandler', () => {
     });
 
     it('should return empty array when no users found', async done => {
-        mysql.connect = jest.fn().mockImplementation((query, callback) => callback(null, []));
-       
+        // mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []));
+       mysql.query = jest.fn().mockImplementation(() => {
+           return Promise.resolve([]);
+       });
         event = {
             httpMethod: 'GET',
             body: {
@@ -78,7 +79,7 @@ describe('Test getUsersRegistrationStatusHandler', () => {
             }
         };
 
-        const result = await lambda.getUsersRegistrationStatusHandler(event, context, callback, connection);
+        const result = await lambda.getUsersRegistrationStatusHandler(event, context, callback, mysql);
 
         const expectedResult = {
             statusCode: 200,
@@ -88,9 +89,11 @@ describe('Test getUsersRegistrationStatusHandler', () => {
                 }
             }
         };
+
         expectedResult.body = JSON.stringify(expectedResult.body);
 
         expect(result).toEqual(expectedResult);
+        done();
     });
 
 });
