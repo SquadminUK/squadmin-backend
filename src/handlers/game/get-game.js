@@ -1,6 +1,25 @@
 var mysql = require('mysql');
+const { from } = require('rxjs');
+const { filter, first } = require('rxjs/operators');
 
 exports.getGameByIdHandler = async (event, context, callback, connection) => {
+    
+    var response = {
+        statusCode: 200,
+        body: {
+            results: {
+                game: {
+                },
+                invitedPlayers: []
+            }
+        }
+    }
+    
+    var badRequest = {
+        statusCode: 400,
+        message: "Bad request",
+        reason: null
+    };
     
     if (connection === undefined) {
         connection = mysql.createConnection({
@@ -11,110 +30,74 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
             port: process.env.RDS_PORT,
             database: process.env.RDS_DATABASE,
             multipleStatements: true
-        });;
-    }
-
-    var response = {
-        statusCode: 200,
-        game: {
-            game_id: '',
-            venue: '',
-            location: '',
-            date_created: '',
-            date_modified: '',
-            organising_player: '',
-            invitedPlayers: [
-                {
-                    organised_game_id: '',
-                    response_id: '',
-                    date_responded: '',
-                    can_play: '',
-                    date_modified: '',
-                    user_id: ''
-                }
-            ]
-        }
+        });
     }
     
-    var badRequest = {
-        statusCode: 400,
-        message: "Bad request",
-        reason: null
-    };
-    
-    var noDeviceFound = {
-        statusCode: 200,
-        results: [],
-        message: ''
-    };
-
-    const { httpMethod, path } = event;
+    var gameId = undefined;
     try {
+        const { httpMethod } = event;
+        gameId = event.pathParameters.id;
         if (httpMethod !== 'GET') {
             throw new Error(`getGameHandlerById only accepts GET method, you tried: ${httpMethod}`);
         }
         
-        if (path === undefined || path === '') {
+        if (gameId === undefined || gameId === '') {
             throw new Error('No game id provided');
         }
     } catch(exception) {
         badRequest.reason = exception.message;
         return badRequest;
     }
-
-    if (connection.state === 'disconnected') {
-        try {
-            await connection.connect(function (err) {
-                if (err) {
-                    throw new Error('Failed to connect');
-                }
-            });
-            console.log("connected");
-        } catch (exception) {
-            connection.end();
-            response = badRequest;
-            response.reason = "Failed to connect";
-            return response;
-        }
-        
-        var getGameSql = "SELECT *  FROM OrganisedGame WHERE game_id = ?";
-        var gameId = [path];
-        var formattedGetGameQuery = mysql.format(getGameSql, gameId);
-
-        var getInvitations = "SELECT * FROM GameResponse WHERE organised_game_id = ?";
-        var formattedInvitationsQuery = mysql.format(getInvitations, gameId);
-
-        try {
-            var getGameByIdQuery = await connection.query(`${formattedGetGameQuery}; ${formattedInvitationsQuery}`, function (err, results, fields) {
-            // var getGameByIdQuery = await connection.query(options, function (err, results, fields) {
-                connection.end();
-                if (err) {
-                    throw new Error('There was an issue with the get game SQL statement');
-                }
-
-                console.log(results[0]);
-                console.log(results[1]);
-
-                if (results) {
-                     game = results[0];
-                     response.game.game_id = game.game_id;
-                     response.game.venue = game.venue;
-                     response.game.location = game.location;
-                     response.game.date_created = game.date_created;
-                     reponse.game.organising_player = game.organising_player;
-                     response.game.invitedPlayers = results[1];
-
-                } else {
-                    
-                }
+    
+    try {
+        if (connection.state === 'disconnected') {
+            await new Promise((resolve, reject) => {
+                connection.connect(function (err) {
+                    if (err) {
+                        response = badRequest;
+                        new Error('Failed to connect');
+                    }
+                    resolve();
+                });
             });
             
-        } catch (exception) {
-            connection.end();
-            badRequest.message = exception;
-            return badRequest;
+            try {
+                var getGameDetailsSql = "SELECT * FROM OrganisedGame Game INNER JOIN GameResponse Invitation ON Game.organised_game_id = Invitation.game_id WHERE Game.game_id = ?";
+                var gameParams = [gameId];
+                var formattedGetGameQuery = mysql.format(getGameDetailsSql, gameParams);
+                
+                var options = {sql: formattedGetGameQuery, nestTables: true};
+                
+                await new Promise((resolve, reject) => {
+                    connection.query(options, function(err, results) {
+                        if (err) {
+                            connection.end();
+                            throw new Error('There was an issue with the SQL statement');
+                        }
+
+                        const retrievedDetails = from(results);
+                        
+                        const game = retrievedDetails.pipe(first()).subscribe((game) => response.body.results.game = game.Game);
+                        const invites = retrievedDetails.pipe().subscribe((invitation) => { response.body.results.invitedPlayers.push(invitation.Invitation); });
+                        
+                        resolve();
+                    });
+                });
+            } catch (exception) {
+                connection.end();
+                response = badRequest;
+                response.reason = exception.message;
+                return response;
+            }
+            
         }
+    } catch (exception) {
+        connection.end();
+        badRequest.reason = exception.message;
+        return badRequest;
     }
+    
     connection.end();
+    response.body = JSON.stringify(response.body);
     return response;
 }

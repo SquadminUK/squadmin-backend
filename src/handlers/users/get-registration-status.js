@@ -1,36 +1,24 @@
 const mysql = require('mysql');
 const { from, of } = require('rxjs');
-const { filter, count, map, tap, toArray } = require('rxjs/operators');
+const { map, toArray } = require('rxjs/operators');
 
-function formattedMobileNumber(mobileNumber) {
-    var unformatted = mobileNumber;
-    unformatted.trim();
-    unformatted = mobileNumber.replaceAll(" ", "");
-    if (unformatted.startsWith("07")) {
-        unformatted = unformatted.replace("07", "+447");
-    }
-    
-    return unformatted;
-}
+exports.getUsersRegistrationStatusHandler = async(event, context, callback, connection) => {
 
-exports.postGameHandler = async(event, context, callback, connection) => {
-    
     var response = {
-        statusCode: 201,
+        statusCode: 200,
         body: {
             results: {
-                game: {},
-                invitedPlayers: {}
+                users: []
             }
         }
     };
-    
+
     var badRequest = {
         statusCode: 400,
         message: 'Bad request',
         reason: null
     };
-    
+
     if (connection === undefined) {
         connection = mysql.createConnection({
             connectionLimit: 10,
@@ -45,8 +33,8 @@ exports.postGameHandler = async(event, context, callback, connection) => {
     
     try {
         const { httpMethod } = event;
-        if (httpMethod !== 'POST') {
-            throw new Error(`postGameHandler only accepts POST method, you tried: ${httpMethod}`);
+        if (httpMethod !== 'GET') {
+            throw new Error(`getUsersRegistrationStatusHandler only accepts GET method, you tried: ${httpMethod}`);
         }
     } catch (exception) {
         badRequest.reason = exception.message;
@@ -65,7 +53,34 @@ exports.postGameHandler = async(event, context, callback, connection) => {
             });
             
             try {
-                
+                var getUsersSQL = "SELECT * FROM Users WHERE user_id IN (";
+
+                event.body.userIds.forEach(function(value, index, array){
+                        if (index === array.length - 1) {
+                            getUsersSQL += "?) AND has_registered_via_client = true";
+                        } else {
+                            getUsersSQL += "?, ";
+                        }
+                    });
+
+                const formattedQuery = mysql.format(getUsersSQL, event.body.userIds);
+
+                var query = await new Promise((resolve, reject) => {
+                    connection.query(formattedQuery, function(err, results) {
+                        if (err) {
+                            new Error('There was an issue with the SQL Statement');
+                            reject();
+                        }
+
+                        if (results.length > 0) {
+                            results.forEach(user => {
+                                response.body.results.users.push(user);
+                            });
+                        }
+                        resolve();
+                    });
+                });
+
             } catch (exception) {
                 connection.end();
                 response = badRequest;
@@ -79,6 +94,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         return response;
     }
     
+    connection.end();
     response.body = JSON.stringify(response.body);
     return response;
 }
