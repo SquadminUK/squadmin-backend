@@ -94,8 +94,10 @@ jest.mock('mysql', () => ({
             done();
         });
         
-        it.skip('should create and insert a game and the invited players', async done => {
+        it('should create and insert a game and the invited players', async done => {
             
+            mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [])); 
+
             event = {
                 httpMethod: 'POST',
                 body: {

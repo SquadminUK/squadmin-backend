@@ -65,7 +65,44 @@ exports.postGameHandler = async(event, context, callback, connection) => {
             });
             
             try {
-                
+                var nonRegisteredUsersSql = "SELECT * FROM User WHERE mobile_number IN(";
+                var mobileNumbersParams = undefined;
+                var invitedPlayers = from(event.body.invitedPlayers);
+                invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
+                    mobileNumbers.forEach(function(value, index, array) {
+                        if (array.length - 1 == index) {
+                            nonRegisteredUsers += `?) AND registered_via_client = false`;
+                        } else {
+                            nonRegisteredUsers += `?,`;
+                        }
+                    });
+                });
+
+                const formattedNonRegUsersQuery = mysql.format(nonRegisteredUsersSql, mobileNumbersParams);
+
+                // Fetch Non Registered Users
+                var nonRegisteredUsers = undefined;
+                await new Promise((reject, resolve) => {
+                    connection.query(formattedNonRegUsersQuery, function(err, results) {
+                        if (err) {
+                            throw new Error('There was a problem with the SQL Statement');
+                        }
+
+                        if (results.length == 0) {
+                            // All users are registered
+                            // Insert Data to DB
+                            //TODO: Send push notification
+                            response.body.results = event.body;
+                            resolve();
+                        } else if (results.length === mobileNumbersParams.length) {
+                            // All users are unregistered but exists in the db
+                        } else if (results.length < mobileNumbersParams.length) {
+                            // Some users are unregistered and may not exists in the DB
+                            // Workout which ones are saved in the DB
+                        }
+                    });
+                });
+
             } catch (exception) {
                 connection.end();
                 response = badRequest;
