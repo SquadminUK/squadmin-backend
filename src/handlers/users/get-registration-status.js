@@ -73,9 +73,9 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
                         }
 
                         if (results.length > 0) {
-                            for (const user in results) {
+                            results.forEach(user => {
                                 response.body.results.users.push(user);
-                            }
+                            });
                         }
                         resolve();
                     });

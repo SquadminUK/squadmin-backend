@@ -95,4 +95,53 @@ describe('Test getUsersRegistrationStatusHandler', () => {
         done();
     });
 
+    it('should return users and their registration status', async done => {
+
+        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
+            {
+                user_id: 'user_id',
+                full_name: 'full_name',
+                email_address: 'email_address',
+                mobile_number: 'mobile_number',
+                username: 'username',
+                date_of_birth: 'date_of_birth',
+                date_created: 'date_created',
+                date_modified: 'date_modified',
+                signed_up_via_social: true
+            }
+        ]));
+        event = {
+            httpMethod: 'GET',
+            body: {
+                userIds: ['user_id_1', 'user_id_2']
+            }
+        };
+
+        const result = await lambda.getUsersRegistrationStatusHandler(event, context, callback, mysql);
+
+        const expectedResult = {
+            statusCode: 200,
+            body: {
+                results: {
+                    users: [{
+                        user_id: 'user_id',
+                        full_name: 'full_name',
+                        email_address: 'email_address',
+                        mobile_number: 'mobile_number',
+                        username: 'username',
+                        date_of_birth: 'date_of_birth',
+                        date_created: 'date_created',
+                        date_modified: 'date_modified',
+                        signed_up_via_social: true
+                    }]
+                }
+            }
+        };
+
+        expectedResult.body = JSON.stringify(expectedResult.body);
+
+        expect(result).toEqual(expectedResult);
+        done();
+    });
+
 });
