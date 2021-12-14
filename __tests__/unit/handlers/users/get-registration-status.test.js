@@ -27,6 +27,8 @@ jest.mock('mysql', () => ({
 
 describe('Test getUsersRegistrationStatusHandler', () => {
 
+    beforeEach( () => jest.resetModules() );
+
     it('should not accept the POST http method', async done => {
         event = {
             httpMethod: 'POST',
@@ -68,10 +70,7 @@ describe('Test getUsersRegistrationStatusHandler', () => {
     });
 
     it('should return empty array when no users found', async done => {
-        // mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []));
-       mysql.query = jest.fn().mockImplementation(() => {
-           return Promise.resolve([]);
-       });
+        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []));
         event = {
             httpMethod: 'GET',
             body: {

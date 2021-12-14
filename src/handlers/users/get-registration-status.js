@@ -65,7 +65,7 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
 
                 const formattedQuery = mysql.format(getUsersSQL, event.body.userIds);
 
-                await new Promise((reject, resolve) => {
+                var query = await new Promise((resolve, reject) => {
                     connection.query(formattedQuery, function(err, results) {
                         if (err) {
                             new Error('There was an issue with the SQL Statement');
