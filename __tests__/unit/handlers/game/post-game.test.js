@@ -174,5 +174,9 @@ describe('Test postGameHandler', () => {
         expect(result).toEqual(expectedResult);
         done();
     });
+
+    it('should recognise one player isnt in the database and insert them', async done => {
+        
+    });
     
 });

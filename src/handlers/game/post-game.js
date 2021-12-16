@@ -97,8 +97,9 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         } else if (results.length === mobileNumbersParams.length) {
                             // All users are unregistered but exists in the db, shouldn't have to do anything here
                         } else if (results.length < mobileNumbersParams.length) {
-                            // Some users are unregistered and may not exists in the DB
+                            // Some users are unregistered and not in the DB
                             // Workout which ones are saved in the DB
+                            
                         }
 
                         resolve();
