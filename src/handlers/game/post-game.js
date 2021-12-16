@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const uuid = require('uuid-v4');
+const { uuid } = require('uuidv4');
 const { from, of } = require('rxjs');
 const { filter, count, map, tap, toArray } = require('rxjs/operators');
 
@@ -93,12 +93,35 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         if (results.length == 0) {
                             // All users don't exist in the DB
                             // Insert a claimable ghost record in the DB for each user
+                            // await new Promise((resolve, reject) => {
+                            //     connection.query("INSERT INTO User (user_id, mobile_number) VALUES ?",
+                            //     [event.body.invitedPlayers.map(user => [uuid(), user.mobile_number])],
+                            //     (err, results) => {
+                            //         if (err) {
+                            //             throw new Error('There was an issue with the SQL Statement');
+                            //         }
+                            //         resolve();
+                            //     });
+                            // });
                             
+
+                            // const items = [
+                            //     {name: 'alpha', description: 'describes alpha', value: 1},
+                            //     ...
+                            // ];
+                            
+                            // db.query(
+                            //     'INSERT INTO my_table (name, description, value) VALUES ?',
+                            //     [items.map(item => [item.name, item.description, item.value])],
+                            //     (error, results) => {...}
+                            // );
                             response.body.results = event.body;
                             console.log("working here");
                         } else if (results.length === event.body.invitedPlayers.length) {
                             // All users exists in the db, shouldn't have to do anything here
+
                             // Send Notification to registered users (filter)
+
                         } else if (results.length < event.body.invitedPlayers.length) {
                             // Some users are not in the DB
                             console.log("working here");
