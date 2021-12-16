@@ -75,6 +75,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         } else {
                             nonRegisteredUsers += `?,`;
                         }
+                        event.body.invitedPlayers[index].mobile_number = value;
                     });
                 });
 
@@ -82,7 +83,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
 
                 // Fetch Non Registered Users
                 var nonRegisteredUsers = undefined;
-                await new Promise((reject, resolve) => {
+                await new Promise((resolve, reject) => {
                     connection.query(formattedNonRegUsersQuery, function(err, results) {
                         if (err) {
                             throw new Error('There was a problem with the SQL Statement');
@@ -93,13 +94,14 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                             // Insert Data to DB
                             //TODO: Send push notification
                             response.body.results = event.body;
-                            resolve();
                         } else if (results.length === mobileNumbersParams.length) {
-                            // All users are unregistered but exists in the db
+                            // All users are unregistered but exists in the db, shouldn't have to do anything here
                         } else if (results.length < mobileNumbersParams.length) {
                             // Some users are unregistered and may not exists in the DB
                             // Workout which ones are saved in the DB
                         }
+
+                        resolve();
                     });
                 });
 
