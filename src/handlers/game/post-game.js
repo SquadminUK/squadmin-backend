@@ -31,7 +31,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         message: 'Bad request',
         reason: null
     };
-
+    
     function existsInDB(mobileNumber, array) {
         return array.some(function(user) {
             return user.mobile_number === mobileNumber;
@@ -49,7 +49,20 @@ exports.postGameHandler = async(event, context, callback, connection) => {
             response.body.results = event.body;
         });
     }
-
+    
+    function insertGame() {
+        var insertGameSQL = "INSERT INTO Game VALUES (?, ?, ?, ?)";
+        const game = event.body.game;
+        const gameParams = [game.game_id, game.location, game.date_created, game.organising_player];
+        const formattedInsertGameSQL = mysql.format(insertGameSQL, gameParams);
+        connection.query(formattedInsertGameSQL, function (err, results) {
+            if (err) {
+                throw new Error('There was a problem with the Insert User SQL Statement');
+            }
+            response.body.results = event.body;
+        });
+    }
+    
     if (connection === undefined) {
         connection = mysql.createConnection({
             connectionLimit: 10,
@@ -97,9 +110,9 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         event.body.invitedPlayers[index].mobile_number = value;
                     });
                 });
-
+                
                 const formattedNonRegUsersQuery = mysql.format(nonRegisteredUsersSql, mobileNumbersParams);
-
+                
                 // Fetch Non Registered Users
                 var nonRegisteredUsers = undefined;
                 await new Promise((resolve, reject) => {
@@ -107,15 +120,12 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         if (err) {
                             throw new Error('There was a problem with the SQL Statement');
                         }
-
+                        
                         if (results.length == 0) {
                             // All users don't exist in the DB
                             // Insert a claimable ghost record in the DB for each user
                             const invitedPlayers = event.body.invitedPlayers;
                             insertNonRegisteredUsers(invitedPlayers);
-
-                            // INSERT GAME QUERY
-                            
                         } 
                         else if (results.length === event.body.invitedPlayers.length) {
                             // All users exists in the db, shouldn't have to do anything here except
@@ -140,12 +150,14 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                             
                             insertNonRegisteredUsers(usersToInsert);
                         }
+
+                        insertGame();
                         
                         resolve();
                     });
-
+                    
                 });
-
+                
             } catch (exception) {
                 connection.end();
                 response = badRequest;
