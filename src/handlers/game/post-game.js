@@ -31,6 +31,12 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         message: 'Bad request',
         reason: null
     };
+
+    function existsInDB(mobileNumber, array) {
+        return array.some(function(user) {
+            return user.mobile_number === mobileNumber;
+        });
+    }
     
     if (connection === undefined) {
         connection = mysql.createConnection({
@@ -112,13 +118,28 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         //     // Send Notification to registered users (filter)
                         // } 
                         else if (results.length < event.body.invitedPlayers.length) {
-                            console.log("working out which invited player isn't in the Database");
                             const invitedPlayers = event.body.invitedPlayers;
-                            var usersToInsert = invitedPlayers.map(player => player);
-
-                        
+                            var usersToInsert = Array.from(invitedPlayers);
+                            const usersFromDB = results;
+                            usersToInsert.forEach(function(value, index, array) {
+                                const mobileNumber = value['mobile_number'];
+                                if (existsInDB(mobileNumber, usersFromDB)) {
+                                    usersToInsert.splice(index, 1);
+                                }
+                            });
+                            
+                            console.log("working out which invited player isn't in the Database");
+                            var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
+                            var params = [usersToInsert.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
+                            const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
+                            connection.query(formattedInsertUserSQL, function(err, results) {
+                                if (err) {
+                                    throw new Error('There was a problem with the Insert User SQL Statement');
+                                }
+                                response.body.results = event.body;
+                            });
                         }
-
+                        
                         resolve();
                     });
                 });
