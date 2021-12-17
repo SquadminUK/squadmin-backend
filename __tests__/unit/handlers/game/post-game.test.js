@@ -42,8 +42,6 @@ describe('Test postGameHandler', () => {
     });
     
     it('should create a game and insert all the new players to the system', async done => {
-        
-        // mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []));
         mysql.query = jest.fn()
         .mockImplementationOnce((query, callback) => callback(null, []))
         .mockImplementationOnce((query, callback) => callback(null, []));
