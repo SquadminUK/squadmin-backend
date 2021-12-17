@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const uuid = require('uuid-v4');
+const { uuid } = require('uuidv4');
 const { from, of } = require('rxjs');
 const { filter, count, map, tap, toArray } = require('rxjs/operators');
 
@@ -105,9 +105,6 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                             });
 
                             // INSERT GAME QUERY
-
-
-                            
                             console.log("working here");
                         } 
                         // else if (results.length === event.body.invitedPlayers.length) {
