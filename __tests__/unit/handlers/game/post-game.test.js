@@ -41,7 +41,92 @@ describe('Test postGameHandler', () => {
         done();
     });
     
-    // it.skip('should return an error when any mobile numbers are missing for a player', async done => {
+    it('should create a game and insert all the new players to the system', async done => {
+        
+        // mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []));
+        mysql.query = jest.fn()
+        .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, []));
+        
+        event = {
+            httpMethod: 'POST',
+            body: {
+                game: {
+                    game_id: 'game_id',
+                    venue: 'venue',
+                    location: 'location',
+                    date_created: 'date_created',
+                    date_modified: 'date_modified',
+                    organising_player: 'organising_player'
+                },
+                invitedPlayers: [
+                    {
+                        organised_game_id: 'organised_game_id',
+                        response_id: 'response_id',
+                        mobile_number: '+44 7931 123 457',
+                    },
+                    {
+                        organised_game_id: 'organised_game_id',
+                        response_id: 'response_id',
+                        mobile_number: '07931 123456',
+
+                    },
+                ]
+            }
+        }
+        
+        const result = await lambda.postGameHandler(event, context, callback, mysql);
+        
+        const expectedResult = {
+            statusCode: 201,
+            body: {
+                results: {
+                    game: {
+                        game_id: 'game_id',
+                        venue: 'venue',
+                        location: 'location',
+                        date_created: 'date_created',
+                        date_modified: 'date_modified',
+                        organising_player: 'organising_player'
+                    },
+                    invitedPlayers: [
+                        {
+                            organised_game_id: 'organised_game_id',
+                            response_id: 'response_id',
+                            mobile_number: '+447931123457',
+                        },
+                        {
+                            organised_game_id: 'organised_game_id',
+                            response_id: 'response_id',
+                            mobile_number: '+447931123456',
+    
+                        },
+                    ]
+                }
+            }
+        }
+        
+        expectedResult.body = JSON.stringify(expectedResult.body);
+        expect(result).toEqual(expectedResult);
+        done();
+    });
+    
+    // it('should recognise one player isnt in the database and insert them', async done => {
+    //     mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
+    //         {
+    //             user_id: 'user_id',
+    //             full_name: 'full_name',
+    //             email_address: 'email_address',
+    //             mobile_number: '+447931123456',
+    //             username: 'username',
+    //             has_registered_via_client: false,
+    //             date_of_birth: 'date_of_birth',
+    //             date_created: 'date_created',
+    //             date_modified: 'date_modified',
+    //             signed_up_via_social: true
+    //         }
+    //     ])); 
+        
     //     event = {
     //         httpMethod: 'POST',
     //         body: {
@@ -60,8 +145,8 @@ describe('Test postGameHandler', () => {
     //                     date_responded: 'date_responded',
     //                     can_play: 'can_play',
     //                     date_modified: 'date_modified',
-    //                     user_id: 'user_id',
-    //                     mobile_number: 'mobile_number 0',
+    //                     user_id: 'user_id_2',
+    //                     mobile_number: '+44 7931 123 457',
     //                     email_address: 'email_address 0'
     //                 },
     //                 {
@@ -70,8 +155,8 @@ describe('Test postGameHandler', () => {
     //                     date_responded: 'date_responded',
     //                     can_play: 'can_play',
     //                     date_modified: 'date_modified',
-    //                     user_id: 'user_id',
-    //                     mobile_number: '',
+    //                     user_id: 'user_id_1',
+    //                     mobile_number: '07931 123456',
     //                     email_address: 'email_address 1'
     //                 },
     //             ]
@@ -81,195 +166,46 @@ describe('Test postGameHandler', () => {
     //     const result = await lambda.postGameHandler(event, context, callback, mysql);
         
     //     const expectedResult = {
-    //         statusCode: 400,
-    //         message: "Bad request",
-    //         reason: "Missing required data"
+    //         statusCode: 201,
+    //         body: {
+    //             results: {
+    //                 game: {
+    //                     game_id: 'game_id',
+    //                     venue: 'venue',
+    //                     location: 'location',
+    //                     date_created: 'date_created',
+    //                     date_modified: 'date_modified',
+    //                     organising_player: 'organising_player'
+    //                 },
+    //                 invitedPlayers: [
+    //                     {
+    //                         organised_game_id: 'organised_game_id',
+    //                         response_id: 'response_id',
+    //                         date_responded: 'date_responded',
+    //                         can_play: 'can_play',
+    //                         date_modified: 'date_modified',
+    //                         user_id: 'user_id_2',
+    //                         mobile_number: '+447931123457',
+    //                         email_address: 'email_address 0'
+    //                     },
+    //                     {
+    //                         organised_game_id: 'organised_game_id',
+    //                         response_id: 'response_id',
+    //                         date_responded: 'date_responded',
+    //                         can_play: 'can_play',
+    //                         date_modified: 'date_modified',
+    //                         user_id: 'user_id_1',
+    //                         mobile_number: '+447931123456',
+    //                         email_address: 'email_address 1'
+    //                     },
+    //                 ]
+    //             }
+    //         }
     //     }
         
+    //     expectedResult.body = JSON.stringify(expectedResult.body);
     //     expect(result).toEqual(expectedResult);
     //     done();
     // });
-    
-    it('should create and insert a game and the invited players', async done => {
-        
-        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [])); 
-        
-        event = {
-            httpMethod: 'POST',
-            body: {
-                game: {
-                    game_id: 'game_id',
-                    venue: 'venue',
-                    location: 'location',
-                    date_created: 'date_created',
-                    date_modified: 'date_modified',
-                    organising_player: 'organising_player'
-                },
-                invitedPlayers: [
-                    {
-                        organised_game_id: 'organised_game_id',
-                        response_id: 'response_id',
-                        date_responded: 'date_responded',
-                        can_play: 'can_play',
-                        date_modified: 'date_modified',
-                        user_id: 'user_id_2',
-                        mobile_number: '+44 7931 123 457',
-                        email_address: 'email_address 0'
-                    },
-                    {
-                        organised_game_id: 'organised_game_id',
-                        response_id: 'response_id',
-                        date_responded: 'date_responded',
-                        can_play: 'can_play',
-                        date_modified: 'date_modified',
-                        user_id: 'user_id_1',
-                        mobile_number: '07931 123456',
-                        email_address: 'email_address 1'
-                    },
-                ]
-            }
-        }
-        
-        const result = await lambda.postGameHandler(event, context, callback, mysql);
-        
-        const expectedResult = {
-            statusCode: 201,
-            body: {
-                results: {
-                    game: {
-                        game_id: 'game_id',
-                        venue: 'venue',
-                        location: 'location',
-                        date_created: 'date_created',
-                        date_modified: 'date_modified',
-                        organising_player: 'organising_player'
-                    },
-                    invitedPlayers: [
-                        {
-                            organised_game_id: 'organised_game_id',
-                            response_id: 'response_id',
-                            date_responded: 'date_responded',
-                            can_play: 'can_play',
-                            date_modified: 'date_modified',
-                            user_id: 'user_id_2',
-                            mobile_number: '+447931123457',
-                            email_address: 'email_address 0'
-                        },
-                        {
-                            organised_game_id: 'organised_game_id',
-                            response_id: 'response_id',
-                            date_responded: 'date_responded',
-                            can_play: 'can_play',
-                            date_modified: 'date_modified',
-                            user_id: 'user_id_1',
-                            mobile_number: '+447931123456',
-                            email_address: 'email_address 1'
-                        },
-                    ]
-                }
-            }
-        }
-        
-        expectedResult.body = JSON.stringify(expectedResult.body);
-        expect(result).toEqual(expectedResult);
-        done();
-    });
-    
-    it('should recognise one player isnt in the database and insert them', async done => {
-        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
-            {
-                user_id: 'user_id',
-                full_name: 'full_name',
-                email_address: 'email_address',
-                mobile_number: '+447931123456',
-                username: 'username',
-                has_registered_via_client: false,
-                date_of_birth: 'date_of_birth',
-                date_created: 'date_created',
-                date_modified: 'date_modified',
-                signed_up_via_social: true
-            }
-        ])); 
-        
-        event = {
-            httpMethod: 'POST',
-            body: {
-                game: {
-                    game_id: 'game_id',
-                    venue: 'venue',
-                    location: 'location',
-                    date_created: 'date_created',
-                    date_modified: 'date_modified',
-                    organising_player: 'organising_player'
-                },
-                invitedPlayers: [
-                    {
-                        organised_game_id: 'organised_game_id',
-                        response_id: 'response_id',
-                        date_responded: 'date_responded',
-                        can_play: 'can_play',
-                        date_modified: 'date_modified',
-                        user_id: 'user_id_2',
-                        mobile_number: '+44 7931 123 457',
-                        email_address: 'email_address 0'
-                    },
-                    {
-                        organised_game_id: 'organised_game_id',
-                        response_id: 'response_id',
-                        date_responded: 'date_responded',
-                        can_play: 'can_play',
-                        date_modified: 'date_modified',
-                        user_id: 'user_id_1',
-                        mobile_number: '07931 123456',
-                        email_address: 'email_address 1'
-                    },
-                ]
-            }
-        }
-        
-        const result = await lambda.postGameHandler(event, context, callback, mysql);
-        
-        const expectedResult = {
-            statusCode: 201,
-            body: {
-                results: {
-                    game: {
-                        game_id: 'game_id',
-                        venue: 'venue',
-                        location: 'location',
-                        date_created: 'date_created',
-                        date_modified: 'date_modified',
-                        organising_player: 'organising_player'
-                    },
-                    invitedPlayers: [
-                        {
-                            organised_game_id: 'organised_game_id',
-                            response_id: 'response_id',
-                            date_responded: 'date_responded',
-                            can_play: 'can_play',
-                            date_modified: 'date_modified',
-                            user_id: 'user_id_2',
-                            mobile_number: '+447931123457',
-                            email_address: 'email_address 0'
-                        },
-                        {
-                            organised_game_id: 'organised_game_id',
-                            response_id: 'response_id',
-                            date_responded: 'date_responded',
-                            can_play: 'can_play',
-                            date_modified: 'date_modified',
-                            user_id: 'user_id_1',
-                            mobile_number: '+447931123456',
-                            email_address: 'email_address 1'
-                        },
-                    ]
-                }
-            }
-        }
-        
-        expectedResult.body = JSON.stringify(expectedResult.body);
-        expect(result).toEqual(expectedResult);
-        done();
-    });
     
 });

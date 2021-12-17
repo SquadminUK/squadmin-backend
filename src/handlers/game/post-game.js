@@ -93,22 +93,36 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         if (results.length == 0) {
                             // All users don't exist in the DB
                             // Insert a claimable ghost record in the DB for each user
-                            
-                            response.body.results = event.body;
-                            console.log("working here");
-                        } else if (results.length === event.body.invitedPlayers.length) {
-                            // All users exists in the db, shouldn't have to do anything here
-                            // Send Notification to registered users (filter)
-                        } else if (results.length < event.body.invitedPlayers.length) {
-                            // Some users are not in the DB
-                            console.log("working here");
-                            
-                            // Workout which ones are saved in the DB
-                            console.log("working here");
-                            
-                            // Workout which ones are not registered
+                            const invitedPlayers = event.body.invitedPlayers;
+                            var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
+                            var params = [invitedPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
+                            const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
+                            connection.query(formattedInsertUserSQL, function(err, results) {
+                                if (err) {
+                                    throw new Error('There was a problem with the Insert User SQL Statement');
+                                }
+                                response.body.results = event.body;
+                            });
 
-                        }
+                            // INSERT GAME QUERY
+
+
+                            
+                            console.log("working here");
+                        } 
+                        // else if (results.length === event.body.invitedPlayers.length) {
+                        //     // All users exists in the db, shouldn't have to do anything here
+                        //     // Send Notification to registered users (filter)
+                        // } else if (results.length < event.body.invitedPlayers.length) {
+                        //     // Some users are not in the DB
+                        //     console.log("working here");
+                            
+                        //     // Workout which ones are saved in the DB
+                        //     console.log("working here");
+                            
+                        //     // Workout which ones are not registered
+
+                        // }
 
                         resolve();
                     });
