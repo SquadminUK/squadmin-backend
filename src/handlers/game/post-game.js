@@ -113,10 +113,16 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                             // INSERT GAME QUERY
                             console.log("working here");
                         } 
-                        // else if (results.length === event.body.invitedPlayers.length) {
-                        //     // All users exists in the db, shouldn't have to do anything here
-                        //     // Send Notification to registered users (filter)
-                        // } 
+                        else if (results.length === event.body.invitedPlayers.length) {
+                            // All users exists in the db, shouldn't have to do anything here except
+                            // Send Notification to registered users (filter)
+                            var theRegisteredUsers = undefined;
+                            var usersFromDB = from(results);
+                            usersFromDB.pipe(filter(user => user.has_registered_via_client === true), toArray()).subscribe(registeredUsers => {
+                                theRegisteredUsers = registeredUsers;
+                            });
+                            response.body.results = event.body;
+                        } 
                         else if (results.length < event.body.invitedPlayers.length) {
                             const invitedPlayers = event.body.invitedPlayers;
                             var usersToInsert = Array.from(invitedPlayers);
@@ -128,7 +134,6 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                                 }
                             });
                             
-                            console.log("working out which invited player isn't in the Database");
                             var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
                             var params = [usersToInsert.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
                             const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
