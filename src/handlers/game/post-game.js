@@ -110,16 +110,14 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                         // else if (results.length === event.body.invitedPlayers.length) {
                         //     // All users exists in the db, shouldn't have to do anything here
                         //     // Send Notification to registered users (filter)
-                        // } else if (results.length < event.body.invitedPlayers.length) {
-                        //     // Some users are not in the DB
-                        //     console.log("working here");
-                            
-                        //     // Workout which ones are saved in the DB
-                        //     console.log("working here");
-                            
-                        //     // Workout which ones are not registered
+                        // } 
+                        else if (results.length < event.body.invitedPlayers.length) {
+                            console.log("working out which invited player isn't in the Database");
+                            const invitedPlayers = event.body.invitedPlayers;
+                            var usersToInsert = invitedPlayers.map(player => player);
 
-                        // }
+                        
+                        }
 
                         resolve();
                     });
