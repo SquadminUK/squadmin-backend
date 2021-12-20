@@ -1,9 +1,6 @@
 const mysql = require('mysql');
 
 exports.getDeviceHandler = async (event, context, callback, connection) => {
-    
-    console.log(`Context: ${context.custom}`);
-    console.log(`Context: ${context.custom.HOSTNAME}`);
 
     var response = {
         headers: {},
