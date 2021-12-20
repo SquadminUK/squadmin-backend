@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const { uuid } = require('uuidv4');
 const { from, of } = require('rxjs');
 const { filter, count, map, tap, toArray } = require('rxjs/operators');
 
@@ -30,6 +31,37 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         message: 'Bad request',
         reason: null
     };
+    
+    function existsInDB(mobileNumber, array) {
+        return array.some(function(user) {
+            return user.mobile_number === mobileNumber;
+        });
+    }
+    
+    function insertNonRegisteredUsers(arrayOfPlayers) {
+        var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
+        var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
+        const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
+        connection.query(formattedInsertUserSQL, function (err, results) {
+            if (err) {
+                throw new Error('There was a problem with the Insert User SQL Statement');
+            }
+            response.body.results = event.body;
+        });
+    }
+    
+    function insertGame() {
+        var insertGameSQL = "INSERT INTO Game VALUES (?, ?, ?, ?)";
+        const game = event.body.game;
+        const gameParams = [game.game_id, game.location, game.date_created, game.organising_player];
+        const formattedInsertGameSQL = mysql.format(insertGameSQL, gameParams);
+        connection.query(formattedInsertGameSQL, function (err, results) {
+            if (err) {
+                throw new Error('There was a problem with the Insert User SQL Statement');
+            }
+            response.body.results = event.body;
+        });
+    }
     
     if (connection === undefined) {
         connection = mysql.createConnection({
@@ -65,6 +97,66 @@ exports.postGameHandler = async(event, context, callback, connection) => {
             });
             
             try {
+                var nonRegisteredUsersSql = "SELECT * FROM User WHERE mobile_number IN(";
+                var mobileNumbersParams = undefined;
+                var invitedPlayers = from(event.body.invitedPlayers);
+                invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
+                    mobileNumbers.forEach(function(value, index, array) {
+                        if (array.length - 1 == index) {
+                            nonRegisteredUsers += `?)`;
+                        } else {
+                            nonRegisteredUsers += `?,`;
+                        }
+                        event.body.invitedPlayers[index].mobile_number = value;
+                    });
+                });
+                
+                const formattedNonRegUsersQuery = mysql.format(nonRegisteredUsersSql, mobileNumbersParams);
+                
+                // Fetch Non Registered Users
+                var nonRegisteredUsers = undefined;
+                await new Promise((resolve, reject) => {
+                    connection.query(formattedNonRegUsersQuery, function(err, results) {
+                        if (err) {
+                            throw new Error('There was a problem with the SQL Statement');
+                        }
+                        
+                        if (results.length == 0) {
+                            // All users don't exist in the DB
+                            // Insert a claimable ghost record in the DB for each user
+                            const invitedPlayers = event.body.invitedPlayers;
+                            insertNonRegisteredUsers(invitedPlayers);
+                        } 
+                        else if (results.length === event.body.invitedPlayers.length) {
+                            // All users exists in the db, shouldn't have to do anything here except
+                            // Send Notification to registered users (filter)
+                            var theRegisteredUsers = undefined;
+                            var usersFromDB = from(results);
+                            usersFromDB.pipe(filter(user => user.has_registered_via_client === true), toArray()).subscribe(registeredUsers => {
+                                theRegisteredUsers = registeredUsers;
+                            });
+                            response.body.results = event.body;
+                        } 
+                        else if (results.length < event.body.invitedPlayers.length) {
+                            const invitedPlayers = event.body.invitedPlayers;
+                            var usersToInsert = Array.from(invitedPlayers);
+                            const usersFromDB = results;
+                            usersToInsert.forEach(function(value, index, array) {
+                                const mobileNumber = value['mobile_number'];
+                                if (existsInDB(mobileNumber, usersFromDB)) {
+                                    usersToInsert.splice(index, 1);
+                                }
+                            });
+                            
+                            insertNonRegisteredUsers(usersToInsert);
+                        }
+
+                        insertGame();
+                        
+                        resolve();
+                    });
+                    
+                });
                 
             } catch (exception) {
                 connection.end();

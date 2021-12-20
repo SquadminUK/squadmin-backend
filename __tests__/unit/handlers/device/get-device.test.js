@@ -24,7 +24,6 @@ jest.mock('mysql', () => ({
         it('should throw an error and return that in a response when failing to connect', async done => {
             
             mysql.connect = jest.fn().mockImplementation( (callback) => {
-                // callback('error').rejects();
                 done();
             });
             
