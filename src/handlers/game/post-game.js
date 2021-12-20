@@ -6,7 +6,7 @@ const { filter, count, map, tap, toArray } = require('rxjs/operators');
 function formattedMobileNumber(mobileNumber) {
     var unformatted = mobileNumber;
     unformatted.trim();
-    unformatted = mobileNumber.replaceAll(" ", "");
+    unformatted = mobileNumber.replace(/ /g, "");
     if (unformatted.startsWith("07")) {
         unformatted = unformatted.replace("07", "+447");
     }
