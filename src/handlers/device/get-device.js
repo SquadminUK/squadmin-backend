@@ -2,7 +2,8 @@ const mysql = require('mysql');
 
 exports.getDeviceHandler = async (event, context, callback, connection) => {
     
-    console.log(`Context ${context}`);
+    console.log(`Context: ${context.custom}`);
+    console.log(`Context: ${context.custom.HOSTNAME}`);
 
     var response = {
         headers: {},
@@ -34,10 +35,10 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
     if (connection  === undefined) {
         connection = mysql.createConnection({
             connectionLimit: 10,
-            host: context.RDS_HOSTNAME,
-            user: context.RDS_USERNAME,
-            password: context.RDS_PASSWORD,
-            port: context.RDS_PORT,
+            host: process.env.RDS_HOSTNAME,
+            user: process.env.RDS_USERNAME,
+            password: process.env.RDS_PASSWORD,
+            port: process.env.RDS_PORT,
             database: process.env.RDS_DATABASE
         });
     }
