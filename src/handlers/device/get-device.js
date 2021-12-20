@@ -2,6 +2,8 @@ const mysql = require('mysql');
 
 exports.getDeviceHandler = async (event, context, callback, connection) => {
     
+    console.log(`Context ${context}`);
+
     var response = {
         headers: {},
         isBase64Encoded: false,
