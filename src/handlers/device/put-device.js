@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 
 exports.putDeviceHandler = async (event, context, callback, connection) => {
-    
+    context.callbackWaitsForEmptyEventLoop = false;
     var response = {
         statusCode: 200,
         body: {
