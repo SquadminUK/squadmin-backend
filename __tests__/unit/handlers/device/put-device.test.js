@@ -24,7 +24,7 @@ describe('Test putDeviceHandler', () => {
         event = {
             httpMethod: 'GET',
             pathParameters: {
-                user_id: 'user_id'
+                id: 'id'
             }
         };
 
@@ -44,7 +44,7 @@ describe('Test putDeviceHandler', () => {
         event = {
             httpMethod: 'POST',
             pathParameters: {
-                user_id: ''
+                id: ''
             }
         };
 
@@ -64,7 +64,7 @@ describe('Test putDeviceHandler', () => {
         event = {
             httpMethod: 'PUT',
             pathParameters: {
-                user_id: ''
+                id: ''
             }
         };
 
@@ -89,7 +89,7 @@ describe('Test putDeviceHandler', () => {
         event = {
             httpMethod: 'PUT',
             pathParameters: {
-                user_id: 'user_id'
+                id: 'id'
             },
             body: {
                 device_id: 'device_id',
