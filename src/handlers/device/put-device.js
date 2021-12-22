@@ -69,7 +69,7 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
             });
             
             try {
-                var updateDeviceSql = "UPDATE UserDevice SET device_id = ?, device_make = ?, device_model = ?, ios_push_notification_token = ?, android_push_notification_token = ?) WHERE user_id = ?";
+                var updateDeviceSql = "UPDATE UserDevice SET device_id = ?, device_make = ?, device_model = ?, ios_push_notification_token = ?, android_push_notification_token = ? WHERE user_id = ?";
                 var userIdParams = [event.body.device_id, event.body.device_make, event.body.device_model, event.body.ios_push_notification_token, event.body.android_push_notification_token, userId];
                 var formattedInsertDeviceQuery = mysql.format(updateDeviceSql, userIdParams);
                 
