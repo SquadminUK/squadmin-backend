@@ -42,6 +42,10 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
         const { httpMethod } = event;
         userId = event.pathParameters.id;
         
+        if (event.body) {
+            event.body = JSON.parse(event.body);
+        }
+
         if (httpMethod !== 'PUT') {
             throw new Error(`putDeviceHandler only accepts PUT method, you tried: ${httpMethod}`);
         }
