@@ -3,6 +3,41 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:putDeviceByUserIdFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "putDeviceByUserIdFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "PUT",
+                        "body": {
+                            "user_id": "b01e9620-d62c-4539-bd49-83bfdadcaed2",
+                            "device_make": "Apple",
+                            "device_id": "dade8603-a278-4584-82c6-dd8fb24b0de9",
+                            "device_model": "iPhone 13",
+                            "ios_push_notification_token": null,
+                            "android_push_notification_token": null
+                        },
+                        "pathParameters": {
+                            "id": "b01e9620-d62c-4539-bd49-83bfdadcaed2"
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:getGameByIdFunction",
             "invokeTarget": {
                 "target": "template",
