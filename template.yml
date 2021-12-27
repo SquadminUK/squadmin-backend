@@ -176,7 +176,7 @@ Resources:
         Api:
           Type: Api
           Properties:
-            Path: /device
+            Path: /device/{user_id}
             Method: POST
 
   putDeviceByUserIdFunction:
