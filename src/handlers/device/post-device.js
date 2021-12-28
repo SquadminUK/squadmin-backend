@@ -36,7 +36,7 @@ exports.postDeviceHandler = async (event, context, callback, connection) => {
     const { httpMethod } = event;
     
     try {
-        const userId = event.pathParameters.user_id;
+        const userId = event.pathParameters.id;
         if (httpMethod !== 'POST') {
             throw new Error(`postDeviceHandler only accepts POST method, you tried: ${httpMethod}`);
         }
