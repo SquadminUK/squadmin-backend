@@ -51,7 +51,9 @@ exports.postUserHandler = async (event, context, callback, connection) => {
     
     try {
         const { httpMethod } = event;
-        
+        if (event.body) {
+            event.body = JSON.parse(event.body);
+        }
         if (httpMethod != 'POST') {
             throw new Error(`postUserHandler only accepts POST method, you tried: ${httpMethod}`);
         }
