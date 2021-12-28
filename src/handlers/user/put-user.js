@@ -45,6 +45,9 @@ exports.putUserHandler = async (event, context, callback, connection) => {
     
     var userId = undefined;
     try {
+        if (event.body) {
+            event.body = JSON.parse(event.body);
+        }
         const { httpMethod } = event;
         userId = event.pathParameters.user_id;
         

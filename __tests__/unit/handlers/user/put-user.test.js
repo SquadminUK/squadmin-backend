@@ -127,6 +127,8 @@ describe('Test putUserHandler', () => {
             }
         };
         
+        event.body = JSON.stringify(event.body);
+
         const result = await lambda.putUserHandler(event, context, callback, mysql);
         
         const expectedResult = {

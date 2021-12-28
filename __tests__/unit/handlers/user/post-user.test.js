@@ -97,6 +97,8 @@ describe('Test postUserHandler', () => {
                 signed_up_via_social: true
             }
         };
+
+        event.body = JSON.stringify(event.body);
         
         const result = await lambda.postUserHandler(event, context, callback, mysql);
         
