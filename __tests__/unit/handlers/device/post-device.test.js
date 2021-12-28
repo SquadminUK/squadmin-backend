@@ -93,6 +93,7 @@ describe('Test postDeviceHandler', () => {
             }
         };
 
+        event.body = JSON.stringify(event.body);
         const result = await lambda.postDeviceHandler(event, context, callback, mysql);
 
         const expectedResult = {
