@@ -19,7 +19,8 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                 date_of_birth: '',
                 date_created: '',
                 date_modified: '',
-                signed_up_via_social: ''
+                signed_up_via_social: '',
+                has_registered_via_client: ''
             }
         }
     }
@@ -76,8 +77,19 @@ exports.postUserHandler = async (event, context, callback, connection) => {
             });
             
              try {
-                var insertUserSql = "INSERT INTO User (user_id, full_name, email_address, mobile_number, password, username, date_of_birth, date_created, signed_up_via_social) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                var userParams = [event.body.user_id, event.body.full_name, event.body.email_address, event.body.mobile_number, encrypted(event.body.password), event.body.username, event.body.date_of_birth, event.body.date_created, event.body.signed_up_via_social];
+                var insertUserSql = "INSERT INTO User (user_id, full_name, email_address, mobile_number, password, username, date_of_birth, date_created, signed_up_via_social, has_registered_via_client) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                var userParams = [
+                    event.body.user_id, 
+                    event.body.full_name, 
+                    event.body.email_address, 
+                    event.body.mobile_number, 
+                    encrypted(event.body.password), 
+                    event.body.username, 
+                    event.body.date_of_birth, 
+                    event.body.date_created, 
+                    event.body.signed_up_via_social,
+                    event.body.has_registered_via_client
+                 ];
                 var formattedInsertUserQuery = mysql.format(insertUserSql, userParams);
 
                 var insertUserQuery = await new Promise((resolve, reject) => {
@@ -95,7 +107,8 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                             username: event.body.username,
                             date_of_birth: event.body.date_of_birth,
                             date_created: event.body.date_created,
-                            signed_up_via_social: event.body.signed_up_via_social
+                            signed_up_via_social: event.body.signed_up_via_social,
+                            has_registered_via_client: event.body.has_registered_via_client
                         };
                         connection.end();
                         resolve();
