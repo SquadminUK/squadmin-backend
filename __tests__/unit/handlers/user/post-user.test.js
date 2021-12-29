@@ -80,7 +80,8 @@ describe('Test postUserHandler', () => {
                 date_of_birth: 'date_of_birth',
                 date_created: 'date_created',
                 date_modified: 'date_modified',
-                signed_up_via_social: true
+                signed_up_via_social: true,
+                has_registered_via_client: true
             }
         ])),
 
@@ -94,7 +95,8 @@ describe('Test postUserHandler', () => {
                 username: 'username',
                 date_of_birth: 'date_of_birth',
                 date_created: 'date_created',
-                signed_up_via_social: true
+                signed_up_via_social: true,
+                has_registered_via_client: true
             }
         };
 
@@ -113,7 +115,8 @@ describe('Test postUserHandler', () => {
                     username: 'username',
                     date_of_birth: 'date_of_birth',
                     date_created: 'date_created',
-                    signed_up_via_social: true
+                    signed_up_via_social: true,
+                    has_registered_via_client: true
                 }
             }
         }
