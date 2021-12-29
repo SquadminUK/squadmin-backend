@@ -79,7 +79,7 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                 var userId = event.pathParameters.user_id;
                 var formattedGetUserQuery = mysql.format(getUserSql, userId);
                 
-                await new Promise((reject, resolve) => {
+                await new Promise((resolve, reject) => {
                     connection.query(formattedGetUserQuery, function(err, results) {
                         if (err) {
                             new Error('There was an issue with the SQL statement');
