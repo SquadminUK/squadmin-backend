@@ -115,7 +115,7 @@ Resources:
         Api:
           Type: Api
           Properties:
-            Path: /device/{user_id}
+            Path: /device/{id}
             Method: PUT
 
   putUserByIdFunction:
