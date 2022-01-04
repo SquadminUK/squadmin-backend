@@ -76,7 +76,7 @@
                     "json": {
                         "httpMethod": "GET",
                         "pathParameters": {
-                            "id": "54e0daa6-1c86-4771-a2f0-8d13de05b9ac"
+                            "id": "103f8179-2d94-4a7b-9119-bfc0acda8c4b"
                         }
                     }
                 },
@@ -181,7 +181,9 @@
                 "payload": {
                     "json": {
                         "httpMethod": "GET",
-                        "path": "54e0daa6-1c86-4771-a2f0-8d13de05b9ac"
+                        "pathParameters": {
+                            "id": "103f8179-2d94-4a7b-9119-bfc0acda8c4b"
+                        }
                     }
                 },
                 "environmentVariables": {
