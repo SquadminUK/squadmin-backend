@@ -62,7 +62,7 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
             });
             
             try {
-                var getGameDetailsSql = "SELECT * FROM OrganisedGame Game INNER JOIN GameResponse Invitation ON Game.organised_game_id = Invitation.game_id WHERE Game.game_id = ?";
+                var getGameDetailsSql = "SELECT * FROM OrganisedGame Game INNER JOIN GameInvitation Invitation ON Game.game_id = Invitation.game_id WHERE Game.game_id = ?";
                 var gameParams = [gameId];
                 var formattedGetGameQuery = mysql.format(getGameDetailsSql, gameParams);
                 
