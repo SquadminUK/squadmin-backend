@@ -3,6 +3,53 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:postGameByIdFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "postGameByIdFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "POST",
+                        "body": {
+                            "game": {
+                                "game_id": "935f2355-80a1-4bcc-97cd-24b3a5969d91",
+                                "venue": "venue",
+                                "location": "location",
+                                "date_created": "2022-01-06 15:30:45",
+                                "date_modified": null,
+                                "organising_player": "248ce8b9-8c49-421c-9757-4b02c98792d1"
+                            },
+                            "invitedPlayers": [
+                                {
+                                    "organised_game_id": "935f2355-80a1-4bcc-97cd-24b3a5969d91",
+                                    "response_id": "1b2e92d3-24c1-4117-816f-051547c09689",
+                                    "mobile_number": "+44 7931 111 123",
+                                },
+                                {
+                                    "organised_game_id": "935f2355-80a1-4bcc-97cd-24b3a5969d91",
+                                    "response_id": "ee4b10c5-4e0a-4074-8d95-4bff39727b51",
+                                    "mobile_number": "07931 654321",
+            
+                                },
+                            ]
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:getUserByIdFunction",
             "invokeTarget": {
                 "target": "template",

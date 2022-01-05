@@ -73,6 +73,8 @@ describe('Test postGameHandler', () => {
             }
         }
         
+        event.body = JSON.stringify(event.body);
+
         const result = await lambda.postGameHandler(event, context, callback, mysql);
         
         const expectedResult = {
@@ -149,6 +151,8 @@ describe('Test postGameHandler', () => {
                 ]
             }
         }
+
+        event.body = JSON.stringify(event.body);
         
         const result = await lambda.postGameHandler(event, context, callback, mysql);
         
@@ -240,6 +244,8 @@ describe('Test postGameHandler', () => {
                 ]
             }
         }
+
+        event.body = JSON.stringify(event.body);
         
         const result = await lambda.postGameHandler(event, context, callback, mysql);
         
