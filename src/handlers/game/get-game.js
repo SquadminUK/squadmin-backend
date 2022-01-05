@@ -72,7 +72,7 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
                     connection.query(options, function(err, results) {
                         if (err) {
                             connection.end();
-                            throw new Error('There was an issue with the SQL statement');
+                            throw new Error(`There was an issue with the SQL statement: ${formattedGetGameQuery}`);
                         }
 
                         const retrievedDetails = from(results);
