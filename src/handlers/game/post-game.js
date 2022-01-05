@@ -41,9 +41,9 @@ exports.postGameHandler = async(event, context, callback, connection) => {
     async function insertNonRegisteredUsers(arrayOfPlayers) {
         await new Promise((resolve, reject) => {
             var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
-            // Save the new userID to the user as its needed to insert GameInvitations
             var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
 
+            //TODO: Save the new userID to the user as its needed to insert GameInvitations
             // var userData = from(params[0]).pipe(map(data => data[0], toArray())).subscribe(userData => {
             //     console.log(`User Data: ${userData}`);
             // });
