@@ -84,18 +84,32 @@ exports.postGameHandler = async(event, context, callback, connection) => {
     
     async function insertInvites() {
         await new Promise((resolve, reject) => {
-            const getPlayersQuery = usersQuery();
-            connection.query(getPlayersQuery, function(err, results) {
+            var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
+                var mobileNumbersParams = [];
+                var invitedPlayers = from(event.body.invitedPlayers);
+                invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
+                    mobileNumbers.forEach(function(value, index, array) {
+                        if (array.length - 1 == index) {
+                            getAllUsersQuery += `?)`;
+                        } else {
+                            getAllUsersQuery += `?,`;
+                        }
+                        event.body.invitedPlayers[index].mobile_number = value;
+                        mobileNumbersParams.push(value);
+                    });
+                });
+                const formattedAllUsersQuery = mysql.format(getAllUsersQuery, mobileNumbersParams);
+                connection.query(formattedAllUsersQuery, function(err, results) {
                 if (err) {
                     throw new Error('There was in issue with the SQL statement before inserting GameInvites');
                 }
-
+                
                 if (results.length > 0) {
                     results.forEach(function(value, index, array) {
                         event.body.invitedPlayers[index].user_id = value['user_id'];
                     });
                 }
-
+                
                 var insertGameInvitesSQL = "INSERT INTO GameInvitation (response_id, organised_game_id, user_id) VALUES ?";
                 var inviteParams = [event.body.invitedPlayers.map(invite => [invite.response_id, invite.organised_game_id, invite.user_id])];
                 const formattedInsertInviteSQL = mysql.format(insertGameInvitesSQL, inviteParams);
@@ -108,25 +122,6 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                 
             });
         });
-    }
-    
-    async function usersQuery() {
-        var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
-        var mobileNumbersParams = [];
-        var invitedPlayers = from(event.body.invitedPlayers);
-        invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
-            mobileNumbers.forEach(function(value, index, array) {
-                if (array.length - 1 == index) {
-                    getAllUsersQuery += `?)`;
-                } else {
-                    getAllUsersQuery += `?,`;
-                }
-                event.body.invitedPlayers[index].mobile_number = value;
-                mobileNumbersParams.push(value);
-            });
-        });
-
-        return mysql.format(getAllUsersQuery, mobileNumbersParams);
     }
     
     if (connection === undefined) {
@@ -168,8 +163,21 @@ exports.postGameHandler = async(event, context, callback, connection) => {
             });
             
             try {          
-                const formattedNonRegUsersQuery = usersQuery();
-                console.log(`${formattedNonRegUsersQuery}`);
+                var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
+                var mobileNumbersParams = [];
+                var invitedPlayers = from(event.body.invitedPlayers);
+                invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
+                    mobileNumbers.forEach(function(value, index, array) {
+                        if (array.length - 1 == index) {
+                            getAllUsersQuery += `?)`;
+                        } else {
+                            getAllUsersQuery += `?,`;
+                        }
+                        event.body.invitedPlayers[index].mobile_number = value;
+                        mobileNumbersParams.push(value);
+                    });
+                });
+                const formattedNonRegUsersQuery = mysql.format(getAllUsersQuery, mobileNumbersParams);
                 // Fetch Non Registered Users
                 var nonRegisteredUsers = undefined;
                 await new Promise((resolve, reject) => {
