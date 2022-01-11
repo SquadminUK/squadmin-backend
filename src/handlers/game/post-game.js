@@ -169,7 +169,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
             
             try {          
                 const formattedNonRegUsersQuery = usersQuery();
-                
+                console.log(`${formattedNonRegUsersQuery}`);
                 // Fetch Non Registered Users
                 var nonRegisteredUsers = undefined;
                 await new Promise((resolve, reject) => {
