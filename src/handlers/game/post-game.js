@@ -84,29 +84,49 @@ exports.postGameHandler = async(event, context, callback, connection) => {
     
     async function insertInvites() {
         await new Promise((resolve, reject) => {
-            var getPlayersQuery = usersQuery();
+            const getPlayersQuery = usersQuery();
+            connection.query(getPlayersQuery, function(err, results) {
+                if (err) {
+                    throw new Error('There was in issue with the SQL statement before inserting GameInvites');
+                }
 
+                if (results.length > 0) {
+                    results.forEach(function(value, index, array) {
+                        event.body.invitedPlayers[index].user_id = value['user_id'];
+                    });
+                }
 
+                var insertGameInvitesSQL = "INSERT INTO GameInvitation (response_id, organised_game_id, user_id) VALUES ?";
+                var inviteParams = [event.body.invitedPlayers.map(invite => [invite.response_id, invite.organised_game_id, invite.user_id])];
+                const formattedInsertInviteSQL = mysql.format(insertGameInvitesSQL, inviteParams);
+                connection.query(formattedInsertInviteSQL, function(err, results) {
+                    if (err) {
+                        throw new Error('There was an issue with the SQL statement inserting GameInvites');
+                    }
+                    resolve();
+                });
+                
+            });
         });
     }
     
-    function usersQuery() {
-        var getAllPlayersQuery = "SELECT * FROM User WHERE mobile_number IN(";
+    async function usersQuery() {
+        var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
         var mobileNumbersParams = [];
         var invitedPlayers = from(event.body.invitedPlayers);
         invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
             mobileNumbers.forEach(function(value, index, array) {
                 if (array.length - 1 == index) {
-                    getAllPlayersQuery += `?)`;
+                    getAllUsersQuery += `?)`;
                 } else {
-                    getAllPlayersQuery += `?,`;
+                    getAllUsersQuery += `?,`;
                 }
                 event.body.invitedPlayers[index].mobile_number = value;
                 mobileNumbersParams.push(value);
             });
         });
 
-        return mysql.format(getAllPlayersQuery, mobileNumbersParams);
+        return mysql.format(getAllUsersQuery, mobileNumbersParams);
     }
     
     if (connection === undefined) {
