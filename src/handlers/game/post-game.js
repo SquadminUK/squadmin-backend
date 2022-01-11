@@ -43,10 +43,14 @@ exports.postGameHandler = async(event, context, callback, connection) => {
             var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
             var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
 
-            //TODO: Save the new userID to the user as its needed to insert GameInvitations
-            // var userData = from(params[0]).pipe(map(data => data[0], toArray())).subscribe(userData => {
-            //     console.log(`User Data: ${userData}`);
-            // });
+            var newUserIds = [];
+            params[0].forEach(function (value, index, array) {
+                newUserIds.push(value[0]);
+            });
+
+            newUserIds.forEach(function (value, index, array) {
+                event.body.invitedPlayers[index].user_id = value;
+            });
 
             const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
             connection.query(formattedInsertUserSQL, function (err, results) {
