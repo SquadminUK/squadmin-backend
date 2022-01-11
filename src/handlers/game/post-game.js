@@ -42,16 +42,16 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         await new Promise((resolve, reject) => {
             var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
             var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
-
+            
             var newUserIds = [];
             params[0].forEach(function (value, index, array) {
                 newUserIds.push(value[0]);
             });
-
+            
             newUserIds.forEach(function (value, index, array) {
                 event.body.invitedPlayers[index].user_id = value;
             });
-
+            
             const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
             connection.query(formattedInsertUserSQL, function (err, results) {
                 if (err) {
@@ -81,11 +81,32 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         });
         
     }
-
+    
     async function insertInvites() {
         await new Promise((resolve, reject) => {
-            var insertInvitationsSQL = "INSERT INTO GameInvitation ("
+            var getPlayersQuery = usersQuery();
+
+
         });
+    }
+    
+    function usersQuery() {
+        var getAllPlayersQuery = "SELECT * FROM User WHERE mobile_number IN(";
+        var mobileNumbersParams = [];
+        var invitedPlayers = from(event.body.invitedPlayers);
+        invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
+            mobileNumbers.forEach(function(value, index, array) {
+                if (array.length - 1 == index) {
+                    getAllPlayersQuery += `?)`;
+                } else {
+                    getAllPlayersQuery += `?,`;
+                }
+                event.body.invitedPlayers[index].mobile_number = value;
+                mobileNumbersParams.push(value);
+            });
+        });
+
+        return mysql.format(getAllPlayersQuery, mobileNumbersParams);
     }
     
     if (connection === undefined) {
@@ -106,7 +127,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         if (httpMethod !== 'POST') {
             throw new Error(`postGameHandler only accepts POST method, you tried: ${httpMethod}`);
         }
-
+        
         if (typeof event.body === 'string') {
             event.body = JSON.parse(event.body);
         }
@@ -126,23 +147,8 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                 });;
             });
             
-            try {
-                var nonRegisteredUsersSql = "SELECT * FROM User WHERE mobile_number IN(";
-                var mobileNumbersParams = [];
-                var invitedPlayers = from(event.body.invitedPlayers);
-                invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
-                    mobileNumbers.forEach(function(value, index, array) {
-                        if (array.length - 1 == index) {
-                            nonRegisteredUsersSql += `?)`;
-                        } else {
-                            nonRegisteredUsersSql += `?,`;
-                        }
-                        event.body.invitedPlayers[index].mobile_number = value;
-                        mobileNumbersParams.push(value);
-                    });
-                });
-                
-                const formattedNonRegUsersQuery = mysql.format(nonRegisteredUsersSql, mobileNumbersParams);
+            try {          
+                const formattedNonRegUsersQuery = usersQuery();
                 
                 // Fetch Non Registered Users
                 var nonRegisteredUsers = undefined;
@@ -181,9 +187,9 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                             
                             insertNonRegisteredUsers(usersToInsert);
                         }
-
+                        
                         insertGame();
-                        // insertInvites();
+                        insertInvites();
                         
                         resolve();
                     });

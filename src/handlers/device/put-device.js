@@ -76,13 +76,6 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
             });
             
             try {
-
-                console.log(`Params: ${event.body.device_id}`);
-                console.log(`Params: ${event.body.device_make}`);
-                console.log(`Params: ${event.body.device_model}`);
-                console.log(`Params: ${event.body.ios_push_notification_token}`);
-                console.log(`Params: ${event.body.android_push_notification_token}`);
-
                 var updateDeviceSql = "UPDATE UserDevice SET device_id = ?, device_make = ?, device_model = ?, ios_push_notification_token = ?, android_push_notification_token = ? WHERE user_id = ?";
                 var userIdParams = [
                     event.body.device_id, 
@@ -93,8 +86,6 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
                     userId
                 ];
                 var formattedUpdateDeviceQuery = mysql.format(updateDeviceSql, userIdParams);
-                
-                console.log(`QUERY: ${formattedUpdateDeviceQuery}`);
                 
                 var insertDeviceQuery = await new Promise((resolve, reject) => {
                     connection.query(formattedUpdateDeviceQuery, function (err, results) {
