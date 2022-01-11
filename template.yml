@@ -52,6 +52,29 @@ Resources:
             Path: /game/{id}
             Method: GET
 
+  postGameByIdFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/game/post-game.postGameHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Timeout: 60
+      Description: A function used to create a game and the invited players
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /game
+            Method: POST
+
   getDeviceByIdFunction:
     Type: AWS::Serverless::Function
     Properties:

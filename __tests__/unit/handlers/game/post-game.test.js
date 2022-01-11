@@ -1,8 +1,9 @@
 const mysql = require('mysql');
 const lambda = require('../../../../src/handlers/game/post-game');
 
-
 var event, context, callback;
+
+jest.mock('uuidv4', () => ({ uuid: () => 'test_id' }));
 
 jest.mock('mysql', () => ({
     state: 'disconnected',
@@ -73,6 +74,8 @@ describe('Test postGameHandler', () => {
             }
         }
         
+        event.body = JSON.stringify(event.body);
+
         const result = await lambda.postGameHandler(event, context, callback, mysql);
         
         const expectedResult = {
@@ -92,11 +95,13 @@ describe('Test postGameHandler', () => {
                             organised_game_id: 'organised_game_id',
                             response_id: 'response_id',
                             mobile_number: '+447931123457',
+                            user_id: 'test_id'
                         },
                         {
                             organised_game_id: 'organised_game_id',
                             response_id: 'response_id',
                             mobile_number: '+447931123456',
+                            user_id: 'test_id'
     
                         },
                     ]
@@ -149,6 +154,8 @@ describe('Test postGameHandler', () => {
                 ]
             }
         }
+
+        event.body = JSON.stringify(event.body);
         
         const result = await lambda.postGameHandler(event, context, callback, mysql);
         
@@ -169,6 +176,7 @@ describe('Test postGameHandler', () => {
                             organised_game_id: 'organised_game_id',
                             response_id: 'response_id',
                             mobile_number: '+447931123457',
+                            user_id: 'test_id'
                         },
                         {
                             organised_game_id: 'organised_game_id',
@@ -240,6 +248,8 @@ describe('Test postGameHandler', () => {
                 ]
             }
         }
+
+        event.body = JSON.stringify(event.body);
         
         const result = await lambda.postGameHandler(event, context, callback, mysql);
         
