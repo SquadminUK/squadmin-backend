@@ -45,6 +45,20 @@ describe('Test postGameHandler', () => {
     it('should create a game and insert all the new players to the system', async done => {
         mysql.query = jest.fn()
         .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, [{
+            user_id: 'test_id',
+                full_name: 'full_name',
+                email_address: 'email_address',
+                mobile_number: '+447931123457',
+                username: 'username',
+                has_registered_via_client: false,
+                date_of_birth: 'date_of_birth',
+                date_created: 'date_created',
+                date_modified: 'date_modified',
+                signed_up_via_social: true
+        }]))
         .mockImplementationOnce((query, callback) => callback(null, []));
         
         event = {

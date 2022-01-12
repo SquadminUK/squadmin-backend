@@ -71,20 +71,25 @@ exports.postGameHandler = async (event, context, callback, connection) => {
     }
     
     async function insertGame() {
-        
-        await new Promise((resolve, reject) => {
-            var insertGameSQL = "INSERT INTO OrganisedGame (game_id, location, date_created, organising_player) VALUES (?, ?, ?, ?)";
-            const game = event.body.game;
-            const gameParams = [game.game_id, game.location, game.date_created, game.organising_player];
-            const formattedInsertGameSQL = mysql.format(insertGameSQL, gameParams);
-            connection.query(formattedInsertGameSQL, function (err, results) {
-                if (err) {
-                    throw new Error('There was a problem with the Insert Game SQL Statement');
-                }
-                response.body.results = event.body;
-                resolve();
+        try {
+            return new Promise((resolve, reject) => {
+                var insertGameSQL = "INSERT INTO OrganisedGame (game_id, location, date_created, organising_player) VALUES (?, ?, ?, ?)";
+                const game = event.body.game;
+                const gameParams = [game.game_id, game.location, game.date_created, game.organising_player];
+                const formattedInsertGameSQL = mysql.format(insertGameSQL, gameParams);
+                connection.query(formattedInsertGameSQL, function (err, results) {
+                    if (err) {
+                        throw new Error('There was a problem with the Insert Game SQL Statement');
+                    }
+                    response.body.results = event.body;
+                    resolve();
+                });
             });
-        });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
         
     }
     
