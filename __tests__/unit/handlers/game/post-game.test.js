@@ -141,6 +141,9 @@ describe('Test postGameHandler', () => {
                 date_modified: 'date_modified',
                 signed_up_via_social: true
         }]))
+        .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, []))
         .mockImplementationOnce((query, callback) => callback(null, []));
         
         event = {
@@ -235,6 +238,9 @@ describe('Test postGameHandler', () => {
             }
             
             ]))
+        .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, []))
+        .mockImplementationOnce((query, callback) => callback(null, []))
         .mockImplementationOnce((query, callback) => callback(null, []));
         
         event = {
