@@ -14,7 +14,7 @@ function formattedMobileNumber(mobileNumber) {
     return unformatted;
 }
 
-exports.postGameHandler = async(event, context, callback, connection) => {
+exports.postGameHandler = async (event, context, callback, connection) => {
     
     var response = {
         statusCode: 201,
@@ -38,53 +38,65 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         });
     }
     
-    async function insertNonRegisteredUsers(arrayOfPlayers) {
-        await new Promise((resolve, reject) => {
-            var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
-            var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
-            
-            var newUserIds = [];
-            params[0].forEach(function (value, index, array) {
-                newUserIds.push(value[0]);
+    function insertNonRegisteredUsers(arrayOfPlayers) {
+        try {
+            return new Promise((resolve, reject) => {
+                var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
+                var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
+                
+                var newUserIds = [];
+                params[0].forEach(function (value, index, array) {
+                    newUserIds.push(value[0]);
+                });
+                
+                newUserIds.forEach(function (value, index, array) {
+                    event.body.invitedPlayers[index].user_id = value;
+                });
+                
+                const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
+                connection.query(formattedInsertUserSQL, function (err, results) {
+                    if (err) {
+                        throw new Error('There was a problem with the Insert User SQL Statement');
+                    }
+                    response.body.results = event.body;
+                    resolve();
+                });
             });
-            
-            newUserIds.forEach(function (value, index, array) {
-                event.body.invitedPlayers[index].user_id = value;
-            });
-            
-            const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
-            connection.query(formattedInsertUserSQL, function (err, results) {
-                if (err) {
-                    throw new Error('There was a problem with the Insert User SQL Statement');
-                }
-                response.body.results = event.body;
-                resolve();
-            });
-        });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
         
     }
     
     async function insertGame() {
-        
-        await new Promise((resolve, reject) => {
-            var insertGameSQL = "INSERT INTO OrganisedGame (game_id, location, date_created, organising_player) VALUES (?, ?, ?, ?)";
-            const game = event.body.game;
-            const gameParams = [game.game_id, game.location, game.date_created, game.organising_player];
-            const formattedInsertGameSQL = mysql.format(insertGameSQL, gameParams);
-            connection.query(formattedInsertGameSQL, function (err, results) {
-                if (err) {
-                    throw new Error('There was a problem with the Insert Game SQL Statement');
-                }
-                response.body.results = event.body;
-                resolve();
+        try {
+            return new Promise((resolve, reject) => {
+                var insertGameSQL = "INSERT INTO OrganisedGame (game_id, location, date_created, organising_player) VALUES (?, ?, ?, ?)";
+                const game = event.body.game;
+                const gameParams = [game.game_id, game.location, game.date_created, game.organising_player];
+                const formattedInsertGameSQL = mysql.format(insertGameSQL, gameParams);
+                connection.query(formattedInsertGameSQL, function (err, results) {
+                    if (err) {
+                        throw new Error('There was a problem with the Insert Game SQL Statement');
+                    }
+                    response.body.results = event.body;
+                    resolve();
+                });
             });
-        });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
         
     }
     
     async function insertInvites() {
-        await new Promise((resolve, reject) => {
-            var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
+        try {
+            return new Promise((resolve, reject) => {
+                var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
                 var mobileNumbersParams = [];
                 var invitedPlayers = from(event.body.invitedPlayers);
                 invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
@@ -100,29 +112,34 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                 });
                 const formattedAllUsersQuery = mysql.format(getAllUsersQuery, mobileNumbersParams);
                 connection.query(formattedAllUsersQuery, function(err, results) {
-                if (err) {
-                    throw new Error('There was in issue with the SQL statement before inserting GameInvites');
-                }
-                
-                if (results.length > 0) {
-                    results.forEach(function(value, index, array) {
-                        event.body.invitedPlayers[index].user_id = value['user_id'];
-                    });
-                }
-                
-                var insertGameInvitesSQL = "INSERT INTO GameInvitation (response_id, organised_game_id, user_id) VALUES ?";
-                var inviteParams = [event.body.invitedPlayers.map(invite => [invite.response_id, invite.organised_game_id, invite.user_id])];
-                const formattedInsertInviteSQL = mysql.format(insertGameInvitesSQL, inviteParams);
-                connection.query(formattedInsertInviteSQL, function(err, results) {
                     if (err) {
-                        throw new Error('There was an issue with the SQL statement inserting GameInvites');
+                        throw new Error('There was in issue with the SQL statement before inserting GameInvites');
                     }
-                    response.body.results = event.body;
-                    resolve();
+                    
+                    if (results.length > 0) {
+                        results.forEach(function(value, index, array) {
+                            event.body.invitedPlayers[index].user_id = value['user_id'];
+                        });
+                    }
+                    
+                    var insertGameInvitesSQL = "INSERT INTO GameInvitation (response_id, organised_game_id, user_id) VALUES ?";
+                    var inviteParams = [event.body.invitedPlayers.map(invite => [invite.response_id, invite.organised_game_id, invite.user_id])];
+                    const formattedInsertInviteSQL = mysql.format(insertGameInvitesSQL, inviteParams);
+                    connection.query(formattedInsertInviteSQL, function(err, results) {
+                        if (err) {
+                            throw new Error('There was an issue with the SQL statement inserting GameInvites');
+                        }
+                        response.body.results = event.body;
+                        resolve();
+                    });
+                    
                 });
-                
             });
-        });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
     }
     
     if (connection === undefined) {
@@ -191,7 +208,10 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                             // All users don't exist in the DB
                             // Insert a claimable ghost record in the DB for each user
                             const invitedPlayers = event.body.invitedPlayers;
-                            insertNonRegisteredUsers(invitedPlayers);
+                            
+                            insertNonRegisteredUsers(invitedPlayers).then(() => {
+                                resolve();
+                            });
                         } 
                         else if (results.length === event.body.invitedPlayers.length) {
                             // All users exists in the db, shouldn't have to do anything here except
@@ -202,6 +222,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                                 theRegisteredUsers = registeredUsers;
                             });
                             response.body.results = event.body;
+                            resolve();
                         } 
                         else if (results.length < event.body.invitedPlayers.length) {
                             const invitedPlayers = event.body.invitedPlayers;
@@ -214,15 +235,24 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                                 }
                             });
                             
-                            insertNonRegisteredUsers(usersToInsert);
+                            insertNonRegisteredUsers(usersToInsert).then(() => {
+                                resolve();
+                            });
                         }
-                        
-                        insertGame();
-                        insertInvites();
-                        
-                        resolve();
                     });
                     
+                });
+                
+                await new Promise((resolve, reject) => {
+                    insertGame().then(() => {
+                        resolve();
+                    });
+                });
+                
+                await new Promise((resolve, reject) => {
+                    insertInvites().then(() => {
+                        resolve();
+                    });
                 });
                 
             } catch (exception) {
