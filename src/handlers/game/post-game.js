@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const { uuid } = require('uuidv4');
+const { v4: uuid } = require('uuid');
 const { from, of } = require('rxjs');
 const { filter, count, map, tap, toArray } = require('rxjs/operators');
 
@@ -117,6 +117,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                     if (err) {
                         throw new Error('There was an issue with the SQL statement inserting GameInvites');
                     }
+                    response.body.results = event.body;
                     resolve();
                 });
                 

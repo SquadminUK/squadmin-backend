@@ -3,7 +3,7 @@ const lambda = require('../../../../src/handlers/game/post-game');
 
 var event, context, callback;
 
-jest.mock('uuidv4', () => ({ uuid: () => 'test_id' }));
+jest.mock('uuid', () => ({ v4: () => 'test_id' }));
 
 jest.mock('mysql', () => ({
     state: 'disconnected',

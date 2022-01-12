@@ -15,25 +15,24 @@
                         "httpMethod": "POST",
                         "body": {
                             "game": {
-                                "game_id": "935f2355-80a1-4bcc-97cd-24b3a5969d91",
-                                "venue": "venue",
-                                "location": "location",
-                                "date_created": "2022-01-06 15:30:45",
+                                "game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
+                                "venue": null,
+                                "location": "Some cool venue",
+                                "date_created": "2022-01-11 23:00:00",
                                 "date_modified": null,
-                                "organising_player": "248ce8b9-8c49-421c-9757-4b02c98792d1"
+                                "organising_player": "b01e9620-d62c-4539-bd49-83bfdadcaed2"
                             },
                             "invitedPlayers": [
                                 {
-                                    "organised_game_id": "935f2355-80a1-4bcc-97cd-24b3a5969d91",
-                                    "response_id": "1b2e92d3-24c1-4117-816f-051547c09689",
-                                    "mobile_number": "+44 7931 111 123",
+                                    "organised_game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
+                                    "response_id": "2d887d6e-2d94-40ae-825a-4c93ccad3d96",
+                                    "mobile_number": "+44 7931 123 457"
                                 },
                                 {
-                                    "organised_game_id": "935f2355-80a1-4bcc-97cd-24b3a5969d91",
-                                    "response_id": "ee4b10c5-4e0a-4074-8d95-4bff39727b51",
-                                    "mobile_number": "07931 654321",
-            
-                                },
+                                    "organised_game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
+                                    "response_id": "d1c7962d-b2d4-446f-9495-1a7e448e225b",
+                                    "mobile_number": "+44 7931 654 321"
+                                }
                             ]
                         }
                     }
