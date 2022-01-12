@@ -14,7 +14,7 @@ function formattedMobileNumber(mobileNumber) {
     return unformatted;
 }
 
-exports.postGameHandler = async(event, context, callback, connection) => {
+exports.postGameHandler = async (event, context, callback, connection) => {
     
     var response = {
         statusCode: 201,
@@ -38,29 +38,35 @@ exports.postGameHandler = async(event, context, callback, connection) => {
         });
     }
     
-    async function insertNonRegisteredUsers(arrayOfPlayers) {
-        await new Promise((resolve, reject) => {
-            var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
-            var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
-            
-            var newUserIds = [];
-            params[0].forEach(function (value, index, array) {
-                newUserIds.push(value[0]);
+    function insertNonRegisteredUsers(arrayOfPlayers) {
+        try {
+            return new Promise((resolve, reject) => {
+                var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
+                var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
+                
+                var newUserIds = [];
+                params[0].forEach(function (value, index, array) {
+                    newUserIds.push(value[0]);
+                });
+                
+                newUserIds.forEach(function (value, index, array) {
+                    event.body.invitedPlayers[index].user_id = value;
+                });
+                
+                const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
+                connection.query(formattedInsertUserSQL, function (err, results) {
+                    if (err) {
+                        throw new Error('There was a problem with the Insert User SQL Statement');
+                    }
+                    response.body.results = event.body;
+                    resolve();
+                });
             });
-            
-            newUserIds.forEach(function (value, index, array) {
-                event.body.invitedPlayers[index].user_id = value;
-            });
-            
-            const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
-            connection.query(formattedInsertUserSQL, function (err, results) {
-                if (err) {
-                    throw new Error('There was a problem with the Insert User SQL Statement');
-                }
-                response.body.results = event.body;
-                resolve();
-            });
-        });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
         
     }
     
@@ -85,21 +91,21 @@ exports.postGameHandler = async(event, context, callback, connection) => {
     async function insertInvites() {
         await new Promise((resolve, reject) => {
             var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
-                var mobileNumbersParams = [];
-                var invitedPlayers = from(event.body.invitedPlayers);
-                invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
-                    mobileNumbers.forEach(function(value, index, array) {
-                        if (array.length - 1 == index) {
-                            getAllUsersQuery += `?)`;
-                        } else {
-                            getAllUsersQuery += `?,`;
-                        }
-                        event.body.invitedPlayers[index].mobile_number = value;
-                        mobileNumbersParams.push(value);
-                    });
+            var mobileNumbersParams = [];
+            var invitedPlayers = from(event.body.invitedPlayers);
+            invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
+                mobileNumbers.forEach(function(value, index, array) {
+                    if (array.length - 1 == index) {
+                        getAllUsersQuery += `?)`;
+                    } else {
+                        getAllUsersQuery += `?,`;
+                    }
+                    event.body.invitedPlayers[index].mobile_number = value;
+                    mobileNumbersParams.push(value);
                 });
-                const formattedAllUsersQuery = mysql.format(getAllUsersQuery, mobileNumbersParams);
-                connection.query(formattedAllUsersQuery, function(err, results) {
+            });
+            const formattedAllUsersQuery = mysql.format(getAllUsersQuery, mobileNumbersParams);
+            connection.query(formattedAllUsersQuery, function(err, results) {
                 if (err) {
                     throw new Error('There was in issue with the SQL statement before inserting GameInvites');
                 }
@@ -191,7 +197,10 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                             // All users don't exist in the DB
                             // Insert a claimable ghost record in the DB for each user
                             const invitedPlayers = event.body.invitedPlayers;
-                            insertNonRegisteredUsers(invitedPlayers);
+                            
+                            insertNonRegisteredUsers(invitedPlayers).then(() => {
+                                resolve();
+                            });
                         } 
                         else if (results.length === event.body.invitedPlayers.length) {
                             // All users exists in the db, shouldn't have to do anything here except
@@ -202,6 +211,7 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                                 theRegisteredUsers = registeredUsers;
                             });
                             response.body.results = event.body;
+                            resolve();
                         } 
                         else if (results.length < event.body.invitedPlayers.length) {
                             const invitedPlayers = event.body.invitedPlayers;
@@ -214,15 +224,24 @@ exports.postGameHandler = async(event, context, callback, connection) => {
                                 }
                             });
                             
-                            insertNonRegisteredUsers(usersToInsert);
+                            insertNonRegisteredUsers(usersToInsert).then(() => {
+                                resolve();
+                            });
                         }
-                        
-                        insertGame();
-                        insertInvites();
-                        
-                        resolve();
                     });
                     
+                });
+                
+                await new Promise((resolve, reject) => {
+                    insertGame().then(() => {
+                        resolve();
+                    });
+                });
+                
+                await new Promise((resolve, reject) => {
+                    insertInvites().then(() => {
+                        resolve();
+                    });
                 });
                 
             } catch (exception) {
