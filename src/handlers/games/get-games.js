@@ -42,11 +42,9 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                             response.body.results.organisedGames.push(OrganisedGame);
                         });
                         removeDuplicatesFromOrganisedGames();
-                        // const invites = retrievedDetails.pipe(map((invitation) => invitation.Invitation)).subscribe(Invitation => {
+                        const invites = retrievedDetails.pipe(map((invitation) => invitation.Invitation)).subscribe(Invitation => {
 
-                        // });
-
-                        console.log("check dem!");
+                        });
                     }
                 });
             });
@@ -80,15 +78,11 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                 uniqueGameIds.add(game.id);
                 uniqueGamesSet.add(game);
             }
-            
-
             return !isPresentInSet;
         });
 
         const organisedGames = Array.from(uniqueGamesSet);
         response.body.results.organisedGames = organisedGames;
-
-        console.log("check it agen");
     }
     
     if (connection === undefined) {
