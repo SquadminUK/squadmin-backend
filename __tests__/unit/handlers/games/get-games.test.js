@@ -60,7 +60,7 @@ describe('Test getGamesHandler', () => {
     });
     
     it('should fetch the organised and invited to games', async done => {
-        
+
         event = {
             httpMethod: 'GET',
             pathParameters: {
