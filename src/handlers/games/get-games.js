@@ -43,7 +43,7 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                         });
                         removeDuplicatesFromOrganisedGames();
                         const invites = retrievedDetails.pipe(map((invitation) => invitation.Invitation)).subscribe(Invitation => {
-
+                            console.log("add the invite to the correct game");
                         });
                     }
                 });
