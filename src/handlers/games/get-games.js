@@ -1,7 +1,7 @@
 var sql = require('mysql');
 
 exports.getGamesHandler = async(event, context, callback, connection) => {
-    
+
     var response = {
         statusCode: 200,
         body: {
@@ -17,6 +17,30 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
         message: 'Bad request',
         reason: null
     };
+
+    async function fetchCreatedGames() {
+        try {
+            return new Promise((resolve, reject) => {
+
+            });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
+    }
+
+    async function fetchInvitedToGames() {
+        try {
+            return new Promise((resolve, reject) => {
+                
+            });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
+    }
 
     if (connection === undefined) {
         connection = mysql.createConnection({
@@ -35,6 +59,38 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
         if (httpMethod !== 'GET') {
             throw new Error(`getGamesHandler only accepts GET method, you tried: ${httpMethod}`);
         }
+
+        const userId = event.pathParameters.user_id;
+
+        if (connection.state === 'disconnected') {
+            await new Promise((resolve, reject) => {
+                connection.connect(function (err) {
+                    if (err) {
+                        response = badRequest;
+                        new Error('Failed to connect');
+                    }
+                    resolve();
+                });
+            });
+
+            try {
+
+                fetchCreatedGames().then( () => {
+                    resolve();
+                });
+
+                fetchInvitedToGames().then( () => {
+                    resolve();
+                });
+
+            } catch(exception) {
+                connection.end();
+                response = badRequest;
+                response.reason = exception.message;
+                return response;
+            }
+        }
+
     } catch (exception) {
         badRequest.reason = exception.message;
         return badRequest;
