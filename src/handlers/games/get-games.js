@@ -70,20 +70,25 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
     }
 
     function removeDuplicatesFromOrganisedGames() {
-        const uniqueGames = new Set();
-        const gamesArray = response.body.results.organisedGames;
-        const filteredArr = gamesArray.filter((game) => {
-            const isPresentInSet = uniqueGames.has(game);
+        const uniqueGameIds = new Set();
+        const uniqueGamesSet = new Set();
+        const organisedGamesResponseArray = response.body.results.organisedGames;
+        const filteredArr = organisedGamesResponseArray.filter((game) => {
+            const isPresentInSet = uniqueGameIds.has(game.id);
 
             if (!isPresentInSet) {
-                uniqueGames.add(game);
+                uniqueGameIds.add(game.id);
+                uniqueGamesSet.add(game);
             }
             
 
             return !isPresentInSet;
         });
 
-        console.log("hello");
+        const organisedGames = Array.from(uniqueGamesSet);
+        response.body.results.organisedGames = organisedGames;
+
+        console.log("check it agen");
     }
     
     if (connection === undefined) {
