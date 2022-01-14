@@ -142,11 +142,9 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                     try {
                 
                         fetchCreatedGames().then( () => {
-                            resolve();
-                        });
-                        
-                        fetchInvitedToGames().then( () => {
-                            resolve();
+                            fetchInvitedToGames().then( () => {
+                                resolve();
+                            })
                         });
                         
                     } catch(exception) {
