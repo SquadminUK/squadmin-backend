@@ -83,7 +83,7 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                         });
                     }
 
-                    // resolve();
+                    resolve();
                 });
             });
         } catch (exception) {
@@ -138,7 +138,6 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                         response = badRequest;
                         new Error('Failed to connect');
                     }
-                    // resolve();
 
                     try {
                 
@@ -147,7 +146,7 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                         });
                         
                         fetchInvitedToGames().then( () => {
-                            // resolve();
+                            resolve();
                         });
                         
                     } catch(exception) {
