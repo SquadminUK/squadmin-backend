@@ -26,7 +26,7 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
     async function fetchCreatedGames() {
         try {
             return new Promise((resolve, reject) => {
-                var getGamesSql = "SELECT * FROM OrganisedGame Game LEFT JOIN GameInvitation Invitation ON Invitation.organised_game_id = Game.game_id WHERE Game.organising_player = ? AND Game.event_date > now()";
+                var getGamesSql = "SELECT * FROM OrganisedGame Game INNER JOIN GameInvitation Invitation ON Invitation.organised_game_id = Game.game_id WHERE Game.organising_player = ? AND Game.event_date > now()";
                 const formattedGetUsersGamesQuery = mysql.format(getGamesSql, userId);   
                 
                 const sqlOptions = {sql: formattedGetUsersGamesQuery, nestTables: true};
@@ -43,7 +43,18 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                         });
                         removeDuplicatesFromOrganisedGames();
                         const invites = retrievedDetails.pipe(map((invitation) => invitation.Invitation)).subscribe(Invitation => {
-                            console.log("add the invite to the correct game");
+                            const games = response.body.results.organisedGames;
+                            
+                            games.forEach(function (value, index, array) {
+                                if (value['game_id'] === Invitation.organised_game_id) {
+                                    if (!value['invitedPlayers']) {
+                                        games[index].invitedPlayers = new Array();
+                                    }
+                                    games[index].invitedPlayers.push(Invitation);
+                                }
+                            });
+                            response.body.results.organisedGames = games;
+                            resolve();
                         });
                     }
                 });
