@@ -34,7 +34,6 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                     if (err) {
                         throw new Error('There was an issue with the GetUsersCreatedGames SQL Statement');
                     }
-                    console.log(results);
                     if (results.length > 0) {
                         const retrievedDetails = from(results);
 
@@ -69,7 +68,23 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
     async function fetchInvitedToGames() {
         try {
             return new Promise((resolve, reject) => {
-                
+                var getInvitationsSQL = "SELECT * FROM GameInvitation Invitation INNER JOIN OrganisedGame Game ON Game.game_id = Invitation.organised_game_id WHERE Invitation.user_id = ? AND Game.event_date > now()";
+                const formattedGetInvitesQuery = mysql.format(getInvitationsSQL, userId);
+
+                const sqlOptions = {sql: formattedGetInvitesQuery, nestTables: true};
+                connection.query(sqlOptions, function(err, results){
+                    if (err) {
+                        throw new Error('There was an issue with the GetUserInvites SQL Statement');
+                    }
+                    if (results.length > 0) {
+                        const invitedToGames = response.body.results.invitedToGames;
+                        results.forEach(function (value, index, array) {
+                            console.log("setup invited to");
+                        });
+                    }
+
+                    // resolve();
+                });
             });
         } catch (exception) {
             connection.end();
@@ -128,12 +143,12 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                     try {
                 
                         fetchCreatedGames().then( () => {
-                            // resolve();
+                            resolve();
                         });
                         
-                        // fetchInvitedToGames().then( () => {
-                        //     resolve();
-                        // });
+                        fetchInvitedToGames().then( () => {
+                            // resolve();
+                        });
                         
                     } catch(exception) {
                         connection.end();
