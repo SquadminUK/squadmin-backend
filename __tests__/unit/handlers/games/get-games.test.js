@@ -122,8 +122,21 @@ describe('Test getGamesHandler', () => {
             statusCode: 200,
             body: {
                 results: {
-                    organisedGames: {},
-                    invitedToGames: {}
+                    organisedGames: [{
+                        "id": "id",
+                        "game_id": "game_id",
+                        "venue": null,
+                        "location": "location",
+                        "event_date": "event_date",
+                        "date_created": "date_created",
+                        "date_modified": null,
+                        "organising_player": "organising_player",
+                        "invitedPlayers": [{
+                            
+                        }]
+                     }
+                    ],
+                    invitedToGames: []
                 }
             }
         }
