@@ -46,7 +46,7 @@ describe('Test getGamesHandler', () => {
                 id: 'user_id'
             }
         };
-
+        
         const result = await lamda.getGamesHandler(event, context, callback, mysql);
         
         const expectedResult = {
@@ -60,16 +60,64 @@ describe('Test getGamesHandler', () => {
     });
     
     it('should fetch the organised and invited to games', async done => {
+        
+        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
+            {
+                Game: {
+                    id: 'id',
+                    game_id: "game_id",
+                    venue: null,
+                    location: "location",
+                    event_date: 'event_date',
+                    date_created: 'date_created',
+                    date_modified: 'date_modified',
+                    organising_player: "organising_player"
+                },
+                Invitation: {
+                    id: 'id',
+                    response_id: 'response_id',
+                    date_responded: 'date_responded',
+                    can_play: 'can_play',
+                    date_modified: 'date_modified',
+                    organised_game_id: 'organised_game_id',
+                    user_id: 'user_id',
+                }
+            }
+        ]));
 
+        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
+            {
+                Game: {
+                    id: 'id',
+                    game_id: 'game_id',
+                    venue: null,
+                    location: 'location',
+                    event_date: 'event_date',
+                    date_created: 'date_created',
+                    date_modified: null,
+                    organising_player: 'organising_player',
+                  },
+                  Invitation: {
+                    id: 'id',
+                    response_id: 'response_id',
+                    date_responded: null,
+                    can_play: 'can_play',
+                    date_modified: 'date_modified',
+                    organised_game_id: 'organised_game_id',
+                    user_id: 'user_id',
+                  }
+            }
+        ]));
+        
         event = {
             httpMethod: 'GET',
             pathParameters: {
                 'id': 'user_id'
             }
         };
-
+        
         const result = await lamda.getGamesHandler(event, context, callback, mysql);
-
+        
         const expectedResult = {
             statusCode: 200,
             body: {
@@ -79,11 +127,11 @@ describe('Test getGamesHandler', () => {
                 }
             }
         }
-
-
+        
+        
         expectedResult.body = JSON.stringify(expectedResult.body);
         expect(result).toEqual(expectedResult);
-
+        
         done();
     });
 });
