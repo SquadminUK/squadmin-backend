@@ -79,7 +79,9 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                     if (results.length > 0) {
                         const invitedToGames = response.body.results.invitedToGames;
                         results.forEach(function (value, index, array) {
-                            console.log("setup invited to");
+                            const game = value.Game;
+                            game.invitation = value.Invitation;
+                            response.body.results.invitedToGames.push(game);
                         });
                     }
 
