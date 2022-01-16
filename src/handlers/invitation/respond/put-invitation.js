@@ -47,6 +47,9 @@ exports.putInvitationHandler = async (event, context, callback, connection) => {
         if (invitationId === undefined || invitationId === '') {
             throw new Error('No invitation id provided');
         }
+        if (typeof event.body === 'string') {
+            event.body = JSON.parse(event.body);
+        }
     } catch(exception) {
         if (exception.message === "Cannot read property 'user_id' of undefined") {
             badRequest.reason = "No invitation id provided";
