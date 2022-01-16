@@ -79,12 +79,12 @@ describe('Test getGamesHandler', () => {
                     date_responded: 'date_responded',
                     can_play: 'can_play',
                     date_modified: 'date_modified',
-                    organised_game_id: 'organised_game_id',
+                    organised_game_id: 'game_id',
                     user_id: 'user_id',
                 }
             }
         ]));
-
+        
         mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
             {
                 Game: {
@@ -96,16 +96,16 @@ describe('Test getGamesHandler', () => {
                     date_created: 'date_created',
                     date_modified: null,
                     organising_player: 'organising_player',
-                  },
-                  Invitation: {
+                },
+                Invitation: {
                     id: 'id',
                     response_id: 'response_id',
                     date_responded: null,
                     can_play: 'can_play',
                     date_modified: 'date_modified',
-                    organised_game_id: 'organised_game_id',
+                    organised_game_id: 'game_id',
                     user_id: 'user_id',
-                  }
+                }
             }
         ]));
         
@@ -131,12 +131,37 @@ describe('Test getGamesHandler', () => {
                         "date_created": "date_created",
                         "date_modified": null,
                         "organising_player": "organising_player",
-                        "invitedPlayers": [{
-                            
+                        "invitedPlayers":[{
+                            "id": "id",
+                            "response_id": "response_id",
+                            "date_responded": null,
+                            "can_play": "can_play",
+                            "date_modified": "date_modified",
+                            "organised_game_id": "game_id",
+                            "user_id": "user_id"  
                         }]
-                     }
-                    ],
-                    invitedToGames: []
+                    }],
+                    invitedToGames: [
+                        {
+                            "id": "id",
+                            "game_id": "game_id",
+                            "venue": null,
+                            "location": "location",
+                            "event_date": "event_date",
+                            "date_created": "date_created",
+                            "date_modified": null,
+                            "organising_player": "organising_player",
+                            "invitation": {
+                                "id": "id",
+                                "response_id": "response_id",
+                                "date_responded": null,
+                                "can_play": "can_play",
+                                "date_modified": "date_modified",
+                                "organised_game_id": "game_id",
+                                "user_id": "user_id" 
+                            }
+                        }
+                    ]
                 }
             }
         }
