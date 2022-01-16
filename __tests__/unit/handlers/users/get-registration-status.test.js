@@ -73,8 +73,8 @@ describe('Test getUsersRegistrationStatusHandler', () => {
         mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []));
         event = {
             httpMethod: 'GET',
-            body: {
-                userIds: ['user_id_1', 'user_id_2']
+            pathParameters: {
+                user_ids: ['user_id_1', 'user_id_2']
             }
         };
 
@@ -112,8 +112,8 @@ describe('Test getUsersRegistrationStatusHandler', () => {
         ]));
         event = {
             httpMethod: 'GET',
-            body: {
-                userIds: ['user_id_1', 'user_id_2']
+            pathParameters: {
+                user_ids: ['user_id_1', 'user_id_2']
             }
         };
 

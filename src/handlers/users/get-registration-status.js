@@ -53,17 +53,17 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             });
             
             try {
-                var getUsersSQL = "SELECT * FROM Users WHERE user_id IN (";
+                var getUsersSQL = "SELECT * FROM User WHERE user_id IN (";
 
-                event.body.userIds.forEach(function(value, index, array){
+                event.pathParameters.user_ids.forEach(function(value, index, array){
                         if (index === array.length - 1) {
-                            getUsersSQL += "?) AND has_registered_via_client = true";
+                            getUsersSQL += "?)";
                         } else {
                             getUsersSQL += "?, ";
                         }
                     });
 
-                const formattedQuery = mysql.format(getUsersSQL, event.body.userIds);
+                const formattedQuery = mysql.format(getUsersSQL, event.pathParameters.user_ids);
 
                 var query = await new Promise((resolve, reject) => {
                     connection.query(formattedQuery, function(err, results) {
