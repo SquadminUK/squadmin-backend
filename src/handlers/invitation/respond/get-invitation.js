@@ -38,7 +38,7 @@ exports.getInvitationHandler = async (event, context, callback, connection) => {
     
     try {
         const { httpMethod } = event;
-        invitationId = event.pathParameters.invitation_id;
+        invitationId = event.pathParameters.id;
         
         if (httpMethod !== 'GET') {
             throw new Error(`getInvitationHandler only accepts GET method, you tried: ${httpMethod}`);
