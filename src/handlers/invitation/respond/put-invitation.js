@@ -73,8 +73,8 @@ exports.putInvitationHandler = async (event, context, callback, connection) => {
             });
             
             try {
-                var updateInvitationResponseSql = "UPDATE GameInvitation SET can_play = ?, date_modified = ?) WHERE response_id = ?";
-                var userIdParams = [event.body.can_play, event.body.date_modified, invitationId];
+                var updateInvitationResponseSql = "UPDATE GameInvitation SET can_play = ?, date_modified = ?, date_responded = ? WHERE response_id = ?";
+                var userIdParams = [event.body.can_play, event.body.date_modified, event.body.date_modified, invitationId];
                 var formattedUpdateInvitationQuery = mysql.format(updateInvitationResponseSql, userIdParams);
                 
                 
