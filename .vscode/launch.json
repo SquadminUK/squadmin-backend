@@ -3,6 +3,41 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:putInvitationByIdFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "putInvitationByIdFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "PUT",
+                        "pathParameters": {
+                            "id": "3d7c2da5-b435-40e9-894e-20bfd4d8ff7f"
+                        },
+                        "body": {
+                            "response_id": "3d7c2da5-b435-40e9-894e-20bfd4d8ff7f",
+                            "date_responded": "2022-01-16 21:05:00",
+                            "can_play": true,
+                            "date_modified": "2022-01-01 21:05:00",
+                            "organised_game_id": "890823b4-3f4a-45b8-8e80-2f4858d5daee",
+                            "user_id": "b01e9620-d62c-4539-bd49-83bfdadcaed2"
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:getInvitationByIdFunction",
             "invokeTarget": {
                 "target": "template",
@@ -18,7 +53,13 @@
                         }
                     }
                 },
-                "environmentVariables": {}
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
             }
         },
         {
