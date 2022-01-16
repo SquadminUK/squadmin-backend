@@ -36,6 +36,10 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
         if (httpMethod !== 'GET') {
             throw new Error(`getUsersRegistrationStatusHandler only accepts GET method, you tried: ${httpMethod}`);
         }
+
+        if (typeof event.pathParameters === 'string') {
+            event.pathParameters = JSON.parse(event.pathParameters);
+        }
     } catch (exception) {
         badRequest.reason = exception.message;
         return badRequest;
