@@ -250,7 +250,7 @@ Resources:
           Api:
             Type: Api
             Properties:
-              Path: /users/{[user_ids]}
+              Path: /users/{user_ids}
               Method: GET
 
   putInvitationByIdFunction:
