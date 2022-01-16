@@ -55,8 +55,11 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             try {
                 var getUsersSQL = "SELECT * FROM User WHERE user_id IN (";
 
+                console.log(`Pre Parse: ${event.pathParameters.user_ids}`);
+
                 if (typeof event.pathParameters.user_ids === 'string') {
                     event.pathParameters.user_ids = JSON.parse(event.pathParameters.user_ids);
+                    console.log(`Post Parse: ${event.pathParameters.user_ids}`); 
                 }
                 userIdsArray = Array.from(event.pathParameters.user_ids);
                 userIdsArray.forEach(function(value, index, array){
