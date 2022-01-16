@@ -55,6 +55,8 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             try {
                 var getUsersSQL = "SELECT * FROM User WHERE user_id IN (";
 
+                console.log(`Path Params: ${event.pathParameters}`);
+
                 event.pathParameters.user_ids.forEach(function(value, index, array){
                         if (index === array.length - 1) {
                             getUsersSQL += "?)";
