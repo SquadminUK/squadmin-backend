@@ -53,7 +53,7 @@ describe('Test putInvitationHandler', () => {
         event = {
             httpMethod: 'POST',
             pathParameters: {
-                invitation_id: 'user_id'
+                id: 'user_id'
             }
         };
         
@@ -75,7 +75,7 @@ describe('Test putInvitationHandler', () => {
         event = {
             httpMethod: 'PUT',
             pathParameters: {
-                invitation_id: ''
+                id: ''
             }
         };
         
@@ -112,7 +112,7 @@ describe('Test putInvitationHandler', () => {
         event = {
             httpMethod: 'PUT',
             pathParameters: {
-                invitation_id: 'response_id'
+                id: 'response_id'
             },
             body: {
                 response_id: 'response_id',

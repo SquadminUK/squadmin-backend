@@ -38,7 +38,7 @@ exports.putInvitationHandler = async (event, context, callback, connection) => {
     
     try {
         const { httpMethod } = event;
-        invitationId = event.pathParameters.invitation_id;
+        invitationId = event.pathParameters.id;
         
         if (httpMethod !== 'PUT') {
             throw new Error(`putInvitationHandler only accepts PUT method, you tried: ${httpMethod}`);
@@ -70,7 +70,7 @@ exports.putInvitationHandler = async (event, context, callback, connection) => {
             });
             
             try {
-                var updateInvitationResponseSql = "UPDATE GameResponse SET can_play = ?, date_modified = ?) WHERE response_id = ?";
+                var updateInvitationResponseSql = "UPDATE GameInvitation SET can_play = ?, date_modified = ?) WHERE response_id = ?";
                 var userIdParams = [event.body.can_play, event.body.date_modified, invitationId];
                 var formattedUpdateInvitationQuery = mysql.format(updateInvitationResponseSql, userIdParams);
                 
@@ -83,13 +83,6 @@ exports.putInvitationHandler = async (event, context, callback, connection) => {
                         }
                         
                         response.body.results = event.body;
-                //         response.body.results.response_id = invitationId;
-                //         response.body.results.date_modified = event.body.date_modified;
-                //         response.body.date_responded = event.body.date_responded;
-                //         response.body.can_play = event.body.can_play;
-                // date_modified: '',
-                // organised_game_id: '',
-                // user_id: ''
                         
                         connection.end();
                         resolve();
