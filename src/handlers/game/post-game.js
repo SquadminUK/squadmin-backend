@@ -73,9 +73,9 @@ exports.postGameHandler = async (event, context, callback, connection) => {
     async function insertGame() {
         try {
             return new Promise((resolve, reject) => {
-                var insertGameSQL = "INSERT INTO OrganisedGame (game_id, location, date_created, organising_player) VALUES (?, ?, ?, ?)";
+                var insertGameSQL = "INSERT INTO OrganisedGame (game_id, location, event_date, date_created, organising_player) VALUES (?, ?, ?, ?, ?)";
                 const game = event.body.game;
-                const gameParams = [game.game_id, game.location, game.date_created, game.organising_player];
+                const gameParams = [game.game_id, game.location, game.event_date, game.date_created, game.organising_player];
                 const formattedInsertGameSQL = mysql.format(insertGameSQL, gameParams);
                 connection.query(formattedInsertGameSQL, function (err, results) {
                     if (err) {
