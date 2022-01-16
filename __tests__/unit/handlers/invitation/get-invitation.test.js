@@ -109,7 +109,7 @@ describe('Test getInvitationHandler', () => {
         event = {
             httpMethod: 'GET',
             pathParameters: {
-                invitation_id: 'response_id'
+                id: 'response_id'
             }
         };
         
