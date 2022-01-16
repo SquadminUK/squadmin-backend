@@ -70,12 +70,12 @@ exports.getInvitationHandler = async (event, context, callback, connection) => {
             });
             
             try {
-                var getInvitationResponseSql = "SELECT * FROM GameResponse WHERE response_id = ?";
+                var getInvitationResponseSql = "SELECT * FROM GameInvitation WHERE response_id = ?";
                 var invitationParams = [invitationId];
                 var formattedGetInvitationQuery = mysql.format(getInvitationResponseSql, invitationParams);
                 
                 
-                var insertDeviceQuery = await new Promise((resolve, reject) => {
+                await new Promise((resolve, reject) => {
                     connection.query(formattedGetInvitationQuery, function (err, results) {
                         if (err) {
                             new Error('There was an issue with the update device SQL statement');

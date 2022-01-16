@@ -3,6 +3,27 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:getInvitationByIdFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "getInvitationByIdFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "GET",
+                        "pathParameters": {
+                            "id": "3d7c2da5-b435-40e9-894e-20bfd4d8ff7f"
+                        }
+                    }
+                },
+                "environmentVariables": {}
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:getGamesByUserIdFunction",
             "invokeTarget": {
                 "target": "template",
