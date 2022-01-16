@@ -36,10 +36,6 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
         if (httpMethod !== 'GET') {
             throw new Error(`getUsersRegistrationStatusHandler only accepts GET method, you tried: ${httpMethod}`);
         }
-
-        if (typeof event.pathParameters === 'string') {
-            event.pathParameters = JSON.parse(event.pathParameters);
-        }
     } catch (exception) {
         badRequest.reason = exception.message;
         return badRequest;
@@ -59,6 +55,9 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             try {
                 var getUsersSQL = "SELECT * FROM User WHERE user_id IN (";
 
+                if (typeof event.pathParameters.user_ids === 'string') {
+                    event.pathParameters.user_ids = JSON.parse(event.pathParameters.user_ids);
+                }
                 userIdsArray = Array.from(event.pathParameters.user_ids);
                 userIdsArray.forEach(function(value, index, array){
                         if (index === array.length - 1) {
