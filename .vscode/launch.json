@@ -13,8 +13,11 @@
                 "payload": {
                     "json": {
                         "httpMethod": "GET",
-                        "pathParameters": {
-                            "user_ids":["b01e9620-d62c-4539-bd49-83bfdadcaed2", "248ce8b9-8c49-421c-9757-4b02c98792d1"]
+                        "multiValueQueryStringParameters": {
+                            "user_ids": [
+                                "b01e9620-d62c-4539-bd49-83bfdadcaed2", 
+                                "248ce8b9-8c49-421c-9757-4b02c98792d1" 
+                            ]
                         }
                     }
                 },

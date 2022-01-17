@@ -73,7 +73,7 @@ describe('Test getUsersRegistrationStatusHandler', () => {
         mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, []));
         event = {
             httpMethod: 'GET',
-            pathParameters: {
+            multiValueQueryStringParameters: {
                 user_ids: ['user_id_1', 'user_id_2']
             }
         };
@@ -112,9 +112,12 @@ describe('Test getUsersRegistrationStatusHandler', () => {
         ]));
         event = {
             httpMethod: 'GET',
-            pathParameters: {
-                user_ids: ['user_id_1', 'user_id_2']
-            }
+            multiValueQueryStringParameters: {
+                "user_ids": [
+                    "user_id_1", 
+                    "user_id_2" 
+                ]
+            } 
         };
 
         const result = await lambda.getUsersRegistrationStatusHandler(event, context, callback, mysql);

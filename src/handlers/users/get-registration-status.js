@@ -55,10 +55,8 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             try {
                 var getUsersSQL = "SELECT * FROM User WHERE user_id IN (";
 
-                if (typeof event.pathParameters.user_ids === 'string') {
-                    event.pathParameters.user_ids = JSON.parse(event.pathParameters.user_ids);
-                }
-                event.pathParameters.user_ids.forEach(function(value, index, array){
+                const userIds = event.multiValueQueryStringParameters.user_ids;
+                userIds.forEach(function(value, index, array){
                         if (index === array.length - 1) {
                             getUsersSQL += "?)";
                         } else {
@@ -66,7 +64,7 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
                         }
                     });
 
-                const formattedQuery = mysql.format(getUsersSQL, event.pathParameters.user_ids);
+                const formattedQuery = mysql.format(getUsersSQL, userIds);
 
                 var query = await new Promise((resolve, reject) => {
                     connection.query(formattedQuery, function(err, results) {
