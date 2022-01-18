@@ -7,10 +7,12 @@ describe('Test putGameHandlerById', () => {
     it('should not accept the POST http method', async done => {
         event = {
             httpMethod: 'POST',
-            id: 'game_id'
+            pathParameters: {
+                id: 'game_id'
+            }
         };
         
-        const result = await lambda.putGameHandlerById(event, context, callback, mysql);
+        const result = await lambda.putGameByIdHandler(event, context, callback, mysql);
         
         const expectedResult = {
             "message": "Bad request",
@@ -19,15 +21,18 @@ describe('Test putGameHandlerById', () => {
         };
         
         expect(result).toEqual(expectedResult);
+        done();
     });
     
     it('should not accept the GET http method', async done => {
         event = {
             httpMethod: 'GET',
-            id: 'game_id'
+            pathParameters: {
+                id: 'game_id'
+            }
         };
         
-        const result = await lambda.putGameHandlerById(event, context, callback, mysql);
+        const result = await lambda.putGameByIdHandler(event, context, callback, mysql);
         
         const expectedResult = {
             "message": "Bad request",
@@ -36,15 +41,18 @@ describe('Test putGameHandlerById', () => {
         };
         
         expect(result).toEqual(expectedResult);
+        done();
     });
     
     it('should find the game and mark all the invited players as uninvited', async done => {
         event = {
             httpMethod: 'PUT',
-            id: 'game_id'
+            pathParameters: {
+                id: 'game_id'
+            }
         };
         
-        const result = await lambda.putGameHandlerById(event, context, callback, mysql);
+        const result = await lambda.putGameByIdHandler(event, context, callback, mysql);
 
         const expectedResult = {
             statusCode: 201,
@@ -55,13 +63,14 @@ describe('Test putGameHandlerById', () => {
                     },
                     invitedPlayers: [
                         {
-                            
+
                         }
                     ]
                 }
             }
         }
 
+        expectedResult.body = JSON.stringify(expectedResult.body);
         expect(result).toEqual(expectedResult);
     });
 
