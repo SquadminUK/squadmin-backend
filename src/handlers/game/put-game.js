@@ -1,5 +1,16 @@
 const mysql = require('mysql');
 
+function formattedMobileNumber(mobileNumber) {
+    var unformatted = mobileNumber;
+    unformatted.trim();
+    unformatted = mobileNumber.replace(/ /g, "");
+    if (unformatted.startsWith("07")) {
+        unformatted = unformatted.replace("07", "+447");
+    }
+    
+    return unformatted;
+}
+
 exports.putGameByIdHandler = async (event, context, callback, connection) => {
     
     var response = {
@@ -51,7 +62,9 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
 
     async function updateInvitees() {
         try {
+            // return new Promise((resolve, reject) => {
             
+            // });
         } catch (exception) {
             return badRequest(exception.message);
         }
