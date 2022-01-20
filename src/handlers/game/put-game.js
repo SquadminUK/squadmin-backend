@@ -1,5 +1,7 @@
 const mysql = require('mysql');
-
+const { v4: uuid } = require('uuid');
+const { from, of } = require('rxjs');
+const { filter, count, map, tap, toArray } = require('rxjs/operators');
 function formattedMobileNumber(mobileNumber) {
     var unformatted = mobileNumber;
     unformatted.trim();
@@ -39,6 +41,44 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
     
     var gameId = undefined;
     
+    function existsInDB(mobileNumber, array) {
+        return array.some(function(user) {
+            return user.mobile_number === mobileNumber;
+        });
+    }
+    
+    async function insertNonRegisteredUsers(arrayOfPlayers) {
+        try {
+            return new Promise((resolve, reject) => {
+                var insertUserSQL = 'INSERT INTO User (user_id, mobile_number) VALUES ?';
+                var params = [arrayOfPlayers.map(player => [uuid(), formattedMobileNumber(player.mobile_number)])];
+                
+                var newUserIds = [];
+                params[0].forEach(function (value, index, array) {
+                    newUserIds.push(value[0]);
+                });
+                
+                newUserIds.forEach(function (value, index, array) {
+                    event.body.invitedPlayers[index].user_id = value;
+                });
+                
+                const formattedInsertUserSQL = mysql.format(insertUserSQL, params);
+                connection.query(formattedInsertUserSQL, function (err, results) {
+                    if (err) {
+                        throw new Error('There was a problem with the Insert User SQL Statement');
+                    }
+                    response.body.results = event.body;
+                    resolve();
+                });
+            });
+        } catch (exception) {
+            connection.end();
+            response = badRequest;
+            return response;
+        }
+        
+    }
+    
     async function updateGameDetails() {
         try {
             return new Promise((resolve, reject) => {
@@ -59,15 +99,95 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
             return badRequest(exception.message);            
         }
     }
-
+    
     async function updateInvitees() {
         try {
-            // return new Promise((resolve, reject) => {
-            
-            // });
+            return new Promise((resolve, reject) => {
+                var getAllUsersQuery = "SELECT * FROM User WHERE mobile_number IN(";
+                var mobileNumbersParams = [];
+                var invitedPlayers = from(event.body.invitedPlayers);
+                invitedPlayers.pipe(map(invite => formattedMobileNumber(invite.mobile_number)), toArray()).subscribe(mobileNumbers => {
+                    mobileNumbers.forEach(function(value, index, array) {
+                        if (array.length - 1 == index) {
+                            getAllUsersQuery += `?)`;
+                        } else {
+                            getAllUsersQuery += `?,`;
+                        }
+                        event.body.invitedPlayers[index].mobile_number = value;
+                        mobileNumbersParams.push(value);
+                    });
+                });
+                const formattedAllUsersQuery = mysql.format(getAllUsersQuery, mobileNumbersParams);
+                connection.query(formattedAllUsersQuery, function (err, results) {
+                    if (err) {
+                        throw new Error('There was an issue with the SQL statement when trying to retrieve all invited players');
+                    }
+                    
+                    var invitedPlayers = Array.from(event.body.invitedPlayers);
+                    if (results.length < invitedPlayers) {
+                        // some players exist in DB
+                        invitedPlayers.forEach(function (value, index, array) {
+                            const mobileNumber = value['mobile_number'];
+                            if (existsInDB(mobileNumber, results)) {
+                                invitedPlayers.splice(index, 1);
+                            }
+                        });
+                        
+                        insertNonRegisteredUsers(invitedPlayers).then( () => {
+                            response.body.results.invitedPlayers = invitedPlayers;
+                            resolve();
+                        });
+                    } else if (results.length === 0) {
+                        // none of the players are in the DB
+                        insertNonRegisteredUsers(invitedPlayers).then( () => { 
+                            response.body.results.invitedPlayers = invitedPlayers;
+                            resolve();
+                        });
+                    } else {
+                        response.body.results.invitedPlayers = invitedPlayers;
+                        var uninvitedPlayers = invitedPlayers.filter(player => player.has_been_uninvited === true);
+                        if (uninvitedPlayers.length > 0) {
+                            uninvite(uninvitedPlayers).then( () => {
+                                uninvitedPlayers.forEach(function (value, index, array) {
+                                    removeUninvitedFromResponse(value);
+                                });
+                                
+                                resolve();
+                            });
+                        } else {
+                            resolve();
+                        }
+                    }
+                });
+            });
         } catch (exception) {
             return badRequest(exception.message);
         }
+    }
+    
+    async function uninvite(uninvitedPlayers) {
+        try {
+            return await new Promise ((resolve, reject) => {
+                var updateInviteSQL = "UPDATE GameInvitation SET has_been_uninvited = ? WHERE response_id = ?";
+                var params = [uninvitedPlayers.map(player => [player.has_been_uninvited, player.response_id])];
+                const formattedUnInviteQuery = mysql.format(updateInviteSQL, params);
+                connection.query(formattedUnInviteQuery, function(err, results) {
+                    if (err) {
+                        throw new Error('There was an issue with the Uninvite SQL statement');
+                    }
+                    
+                    resolve();
+                });
+            });  
+        } catch (exception) {
+            return badRequest(exception.message);
+        }
+    }
+
+    function removeUninvitedFromResponse(value) {
+        response.body.results.invitedPlayers = response.body.results.invitedPlayers.filter(function (invite) {
+            return invite.mobile_number !== value['mobile_number'];
+        });
     }
     
     if (connection === undefined) {
@@ -111,18 +231,20 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
                     resolve();
                 });
             });
-
+            
             await new Promise((resolve, reject) => {
                 updateGameDetails().then(() => {
                     resolve();
                 });
             });
-
-            await new Promise((resolve, reject) => {
-                updateInvitees().then( () => {
-                    resolve();
+            
+            if (event.body.invitedPlayers.length > 0) {
+                await new Promise((resolve, reject) => {
+                    updateInvitees().then( () => {
+                        resolve();
+                    });
                 });
-            });
+            }
         }
         
     } catch (exception) {
