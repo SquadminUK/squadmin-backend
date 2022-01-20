@@ -54,7 +54,7 @@ describe('Test putGameHandlerById', () => {
     });
     
     it('should update game details', async done => {
-
+        
         event = {
             httpMethod: 'PUT',
             pathParameters: {
@@ -90,5 +90,60 @@ describe('Test putGameHandlerById', () => {
         expect(result).toEqual(expectedResult);
         done();
     });
+    
+    it('should update the invitation details', async done => {
+        event = {
+            httpMethod: 'PUT',
+            pathParameters: {
+                id: 'game_id'
+            },
+            body: {
+                game: {
+                    location: "location",
+                    event_date: "event_date",
+                    is_active: true                    
+                },
+                invitedPlayers: [
+                    {
+                        organised_game_id: 'organised_game_id',
+                        response_id: 'response_id',
+                        mobile_number: '+44 7931 123 456',
+                    },
+                    {
+                        organised_game_id: 'organised_game_id',
+                        response_id: 'response_id',
+                        mobile_number: '+44 7931 123 457'
+                    },
+                    {
+                        organised_game_id: 'organised_game_id',
+                        response_id: 'response_id',
+                        mobile_number: '+44 7931 654 321'
+                    }
+                ]
+            }
+        };
+        
+        const result = await lambda.putGameByIdHandler(event, context, callback, mysql);
+        
+        const expectedResult = {
+            statusCode: 201,
+            game: {
 
+            },
+            invitedPlayers: [
+                {
+
+                },
+                {
+
+                },
+                {
+                    
+                }
+            ]
+        }
+        
+        done();
+    });
+    
 });

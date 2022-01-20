@@ -48,6 +48,14 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
             return badRequest(exception.message);            
         }
     }
+
+    async function updateInvitees() {
+        try {
+            
+        } catch (exception) {
+            return badRequest(exception.message);
+        }
+    }
     
     if (connection === undefined) {
         connection = mysql.createConnection({
@@ -93,6 +101,12 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
 
             await new Promise((resolve, reject) => {
                 updateGameDetails().then(() => {
+                    resolve();
+                });
+            });
+
+            await new Promise((resolve, reject) => {
+                updateInvitees().then( () => {
                     resolve();
                 });
             });
