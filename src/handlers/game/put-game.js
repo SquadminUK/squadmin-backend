@@ -31,7 +31,7 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
         reason: null
     };
     
-    function badRequest(message) {
+    function badRequestResponse(message) {
         if (message) {
             badRequest.reason = message
         }
@@ -73,7 +73,7 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
             });
         } catch (exception) {
             connection.end();
-            response = badRequest;
+            response = badRequestResponse;
             return response;
         }
         
@@ -83,7 +83,7 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
         try {
             return new Promise((resolve, reject) => {
                 var getGameDetailsSql = "UPDATE OrganisedGame set location = ?, event_date = ?, date_modified = now(), is_active = ? WHERE game_id = ?";
-                var updateGameParams = [event.body.location, event.body.event_date, event.body.is_active, gameId];
+                var updateGameParams = [event.body.game.location, event.body.game.event_date, event.body.game.is_active, gameId];
                 const formattedGetGameQuery = mysql.format(getGameDetailsSql, updateGameParams);
                 
                 connection.query(formattedGetGameQuery, function (err, results) {
@@ -96,7 +96,7 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
                 });
             });
         } catch (exception) {
-            return badRequest(exception.message);            
+            return badRequestResponse(exception.message);            
         }
     }
     
@@ -161,26 +161,45 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
                 });
             });
         } catch (exception) {
-            return badRequest(exception.message);
+            return badRequestResponse(exception.message);
         }
     }
     
     async function uninvite(uninvitedPlayers) {
         try {
             return await new Promise ((resolve, reject) => {
-                var updateInviteSQL = "UPDATE GameInvitation SET has_been_uninvited = ? WHERE response_id = ?";
-                var params = [uninvitedPlayers.map(player => [player.has_been_uninvited, player.response_id])];
-                const formattedUnInviteQuery = mysql.format(updateInviteSQL, params);
-                connection.query(formattedUnInviteQuery, function(err, results) {
-                    if (err) {
-                        throw new Error('There was an issue with the Uninvite SQL statement');
-                    }
-                    
-                    resolve();
+                uninvitedPlayers.forEach(function (value, index, array){
+                    connection.beginTransaction(function (err) {
+                        if (err) {
+                            connection.rollback(function() {
+                                throw new Error('Rollback error');
+                            });
+                            throw new Error('Transaction begin error');
+                        }
+                        var updateInviteSQL = "UPDATE GameInvitation SET has_been_uninvited = ?, date_modified = now() WHERE response_id = ?"; 
+                        var params = [value['has_been_uninvited'], value['response_id']];
+                        var formattedUpdateInviteQuery = mysql.format(updateInviteSQL, params);
+                        connection.query(formattedUpdateInviteQuery, function (err, results){
+                            if (err) {
+                                throw new Error("There was an issue with the UpdateInvite SQL Statement");
+                            }
+                        });
+
+                        if (index === array.length - 1) {
+                            connection.commit(function(err) {
+                                if (err) {
+                                    throw new Error('SQL Statement commit error');
+                                }
+
+                                resolve();
+                            });
+                        }
+
+                    });
                 });
             });  
         } catch (exception) {
-            return badRequest(exception.message);
+            return badRequestResponse(exception.message);
         }
     }
 
@@ -218,8 +237,7 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
         }
         
     } catch(exception) {
-        badRequest.reason = exception.message;
-        return badRequest;
+        return badRequestResponse(exception.message);
     }
     try {
         if (connection.state === 'disconnected') {
@@ -249,7 +267,7 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
         
     } catch (exception) {
         connection.end();
-        response = badRequest;
+        response = badRequestResponse;
         response.reason = exception.message;
         return response;
     }

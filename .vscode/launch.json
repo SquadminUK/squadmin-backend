@@ -3,6 +3,63 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:putGameByIdFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "putGameByIdFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "PUT",
+                        "pathParameters": {
+                            "id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee"
+                        },
+                        "body": {
+                            "game": {
+                                "game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
+                                "venue": null,
+                                "location": "Updated venue",
+                                "event_date": "2022-04-02 19:15:00",
+                                "date_created": "2022-01-11 23:00:00",
+                                "date_modified": null,
+                                "organising_player": "b01e9620-d62c-4539-bd49-83bfdadcaed2"
+                            },
+                            "invitedPlayers": [
+                                {
+                                    "organised_game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
+                                    "response_id": "2d887d6e-2d94-40ae-825a-4c93ccad3d96",
+                                    "mobile_number": "+44 7931 123 457"
+                                },
+                                {
+                                    "organised_game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
+                                    "response_id": "d1c7962d-b2d4-446f-9495-1a7e448e225b",
+                                    "mobile_number": "+44 7931 654 321",
+                                    "has_been_uninvited": true
+                                }, 
+                                {
+                                    "organised_game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
+                                    "response_id": "48fd6b63-2290-4293-9e36-ae19c19babc1",
+                                    "mobile_number": "+447931 123 987",
+                                    "has_been_uninvited": true
+                                }
+                            ]
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:getUsersStatusByIdsFunction",
             "invokeTarget": {
                 "target": "template",
@@ -15,8 +72,8 @@
                         "httpMethod": "GET",
                         "multiValueQueryStringParameters": {
                             "user_ids": [
-                                "b01e9620-d62c-4539-bd49-83bfdadcaed2", 
-                                "248ce8b9-8c49-421c-9757-4b02c98792d1" 
+                                "b01e9620-d62c-4539-bd49-83bfdadcaed2",
+                                "248ce8b9-8c49-421c-9757-4b02c98792d1"
                             ]
                         }
                     }
