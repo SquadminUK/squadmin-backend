@@ -22,7 +22,8 @@ exports.postDeviceHandler = async (event, context, callback, connection) => {
         reason: null
     };
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: stageVars.rds_hostname,
@@ -73,7 +74,7 @@ exports.postDeviceHandler = async (event, context, callback, connection) => {
                 var insertDeviceSql = "INSERT INTO UserDevice (device_id, device_make, device_model, ios_push_notification_token, android_push_notification_token, date_created, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 var userParams = [event.body.device_id, event.body.device_make, event.body.device_model, event.body.ios_push_notification_token, event.body.android_push_notification_token, event.body.date_created, event.pathParameters.id];
                 var formattedInsertDeviceQuery = mysql.format(insertDeviceSql, userParams);
-
+                
                 connection.query(formattedInsertDeviceQuery, function (err, results) {
                     if (err) {
                         new Error('There was an issue with the insert device SQL statement');

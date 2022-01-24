@@ -22,10 +22,11 @@ exports.putInvitationHandler = async (event, context, callback, connection) => {
         message: "Bad request",
         reason: null
     };
-
+    
     var invitationId = '';
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: stageVars.rds_hostname,

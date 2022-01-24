@@ -184,17 +184,17 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
                                 throw new Error("There was an issue with the UpdateInvite SQL Statement");
                             }
                         });
-
+                        
                         if (index === array.length - 1) {
                             connection.commit(function(err) {
                                 if (err) {
                                     throw new Error('SQL Statement commit error');
                                 }
-
+                                
                                 resolve();
                             });
                         }
-
+                        
                     });
                 });
             });  
@@ -202,14 +202,15 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
             return badRequestResponse(exception.message);
         }
     }
-
+    
     function removeUninvitedFromResponse(value) {
         response.body.results.invitedPlayers = response.body.results.invitedPlayers.filter(function (invite) {
             return invite.mobile_number !== value['mobile_number'];
         });
     }
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: stageVars.rds_hostname,

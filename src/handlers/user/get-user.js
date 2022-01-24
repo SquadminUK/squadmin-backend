@@ -32,7 +32,8 @@ exports.getUserHandler = async (event, context, callback, connection) => {
         } 
     };
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: stageVars.rds_hostname,

@@ -24,10 +24,11 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
         message: "Bad request",
         reason: null
     };
-
+    
     var userId = '';
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: stageVars.rds_hostname,
@@ -45,7 +46,7 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
         if (event.body) {
             event.body = JSON.parse(event.body);
         }
-
+        
         if (httpMethod !== 'PUT') {
             throw new Error(`putDeviceHandler only accepts PUT method, you tried: ${httpMethod}`);
         }

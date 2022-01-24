@@ -26,7 +26,8 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
         reason: null
     };
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: stageVars.rds_hostname,
