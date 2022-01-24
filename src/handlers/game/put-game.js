@@ -212,11 +212,11 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
     if (connection === undefined) {
         connection = mysql.createConnection({
             connectionLimit: 10,
-            host: process.env.RDS_HOSTNAME,
-            user: process.env.RDS_USERNAME,
-            password: process.env.RDS_PASSWORD,
-            port: process.env.RDS_PORT,
-            database: process.env.RDS_DATABASE,
+            host: stageVars.rds_hostname,
+            user: stageVars.rds_username,
+            password: stageVars.rds_password,
+            port: stageVars.rds_port,
+            database: stageVars.rds_database,
             multipleStatements: true
         });            
     }
