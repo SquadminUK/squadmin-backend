@@ -29,7 +29,10 @@ jest.mock('mysql', () => ({
             
             event = {
                 httpMethod: 'GET',
-                path: 'device_id'
+                path: 'device_id',
+                stageVariables: {
+                    rds_hostname: 'hostname'
+                }
             };
             const result = await lambda.getDeviceHandler(event, context, callback, mysql);
             
@@ -54,6 +57,9 @@ jest.mock('mysql', () => ({
                 path: 'device_id',
                 pathParameters: {
                     id: 'device_id'
+                },
+                stageVariables: {
+                    rds_hostname: 'hostname'
                 }
             };
         
@@ -88,6 +94,9 @@ jest.mock('mysql', () => ({
                 httpMethod: 'GET',
                 pathParameters: {
                     id: 'device_id'
+                },
+                stageVariables: {
+                    rds_hostname: 'hostname'
                 }
             };
 
@@ -106,7 +115,10 @@ jest.mock('mysql', () => ({
         it('should not accept the PUT http method', async done => {
             event = {
                 httpMethod: 'PUT',
-                path: 'device_id'
+                path: 'device_id',
+                stageVariables: {
+                    rds_hostname: 'hostname'
+                }
             };
 
             const result = await lambda.getDeviceHandler(event, context, callback, mysql);
