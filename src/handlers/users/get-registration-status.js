@@ -3,7 +3,7 @@ const { from, of } = require('rxjs');
 const { map, toArray } = require('rxjs/operators');
 
 exports.getUsersRegistrationStatusHandler = async(event, context, callback, connection) => {
-
+    
     var response = {
         statusCode: 200,
         body: {
@@ -12,21 +12,22 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             }
         }
     };
-
+    
     var badRequest = {
         statusCode: 400,
         message: 'Bad request',
         reason: null
     };
-
-    if (connection === undefined) {
+    
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
-            host: process.env.RDS_HOSTNAME,
-            user: process.env.RDS_USERNAME,
-            password: process.env.RDS_PASSWORD,
-            port: process.env.RDS_PORT,
-            database: process.env.RDS_DATABASE,
+            host: stageVars.rds_hostname,
+            user: stageVars.rds_username,
+            password: stageVars.rds_password,
+            port: stageVars.rds_port,
+            database: stageVars.rds_database,
             multipleStatements: true
         });
     }
@@ -54,25 +55,25 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
             
             try {
                 var getUsersSQL = "SELECT * FROM User WHERE user_id IN (";
-
+                
                 const userIds = event.multiValueQueryStringParameters.user_ids;
                 userIds.forEach(function(value, index, array){
-                        if (index === array.length - 1) {
-                            getUsersSQL += "?)";
-                        } else {
-                            getUsersSQL += "?, ";
-                        }
-                    });
-
+                    if (index === array.length - 1) {
+                        getUsersSQL += "?)";
+                    } else {
+                        getUsersSQL += "?, ";
+                    }
+                });
+                
                 const formattedQuery = mysql.format(getUsersSQL, userIds);
-
+                
                 var query = await new Promise((resolve, reject) => {
                     connection.query(formattedQuery, function(err, results) {
                         if (err) {
                             new Error('There was an issue with the SQL Statement');
                             reject();
                         }
-
+                        
                         if (results.length > 0) {
                             results.forEach(user => {
                                 response.body.results.users.push(user);
@@ -81,7 +82,7 @@ exports.getUsersRegistrationStatusHandler = async(event, context, callback, conn
                         resolve();
                     });
                 });
-
+                
             } catch (exception) {
                 connection.end();
                 response = badRequest;

@@ -36,7 +36,7 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                     }
                     if (results.length > 0) {
                         const retrievedDetails = from(results);
-
+                        
                         const games = retrievedDetails.pipe(map((game) => game.Game)).subscribe(OrganisedGame => {
                             response.body.results.organisedGames.push(OrganisedGame);
                         });
@@ -70,7 +70,7 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
             return new Promise((resolve, reject) => {
                 var getInvitationsSQL = "SELECT * FROM GameInvitation Invitation INNER JOIN OrganisedGame Game ON Game.game_id = Invitation.organised_game_id WHERE Invitation.user_id = ? AND Game.event_date > now()";
                 const formattedGetInvitesQuery = mysql.format(getInvitationsSQL, userId);
-
+                
                 const sqlOptions = {sql: formattedGetInvitesQuery, nestTables: true};
                 connection.query(sqlOptions, function(err, results){
                     if (err) {
@@ -84,7 +84,7 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                             response.body.results.invitedToGames.push(game);
                         });
                     }
-
+                    
                     resolve();
                 });
             });
@@ -94,33 +94,34 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
             return response;
         }
     }
-
+    
     function removeDuplicatesFromOrganisedGames() {
         const uniqueGameIds = new Set();
         const uniqueGamesSet = new Set();
         const organisedGamesResponseArray = response.body.results.organisedGames;
         const filteredArr = organisedGamesResponseArray.filter((game) => {
             const isPresentInSet = uniqueGameIds.has(game.id);
-
+            
             if (!isPresentInSet) {
                 uniqueGameIds.add(game.id);
                 uniqueGamesSet.add(game);
             }
             return !isPresentInSet;
         });
-
+        
         const organisedGames = Array.from(uniqueGamesSet);
         response.body.results.organisedGames = organisedGames;
     }
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
-            host: process.env.RDS_HOSTNAME,
-            user: process.env.RDS_USERNAME,
-            password: process.env.RDS_PASSWORD,
-            port: process.env.RDS_PORT,
-            database: process.env.RDS_DATABASE,
+            host: stageVars.rds_hostname,
+            user: stageVars.rds_username,
+            password: stageVars.rds_password,
+            port: stageVars.rds_port,
+            database: stageVars.rds_database,
             multipleStatements: true
         });
     }
@@ -140,9 +141,9 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
                         response = badRequest;
                         new Error('Failed to connect');
                     }
-
+                    
                     try {
-                
+                        
                         fetchCreatedGames().then( () => {
                             fetchInvitedToGames().then( () => {
                                 resolve();

@@ -39,14 +39,15 @@ exports.postUserHandler = async (event, context, callback, connection) => {
         } 
     };
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
-            host: process.env.RDS_HOSTNAME,
-            user: process.env.RDS_USERNAME,
-            password: process.env.RDS_PASSWORD,
-            port: process.env.RDS_PORT,
-            database: process.env.RDS_DATABASE
+            host: stageVars.rds_hostname,
+            user: stageVars.rds_username,
+            password: stageVars.rds_password,
+            port: stageVars.rds_port,
+            database: stageVars.rds_database
         });
     }
     
@@ -58,7 +59,7 @@ exports.postUserHandler = async (event, context, callback, connection) => {
         if (httpMethod != 'POST') {
             throw new Error(`postUserHandler only accepts POST method, you tried: ${httpMethod}`);
         }
-
+        
     } catch (exception) {
         badRequest.reason = exception.message;
         return badRequest;
@@ -76,7 +77,7 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                 })
             });
             
-             try {
+            try {
                 var insertUserSql = "INSERT INTO User (user_id, full_name, email_address, mobile_number, password, username, date_of_birth, date_created, signed_up_via_social, has_registered_via_client) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 var userParams = [
                     event.body.user_id, 
@@ -89,16 +90,16 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                     event.body.date_created, 
                     event.body.signed_up_via_social,
                     event.body.has_registered_via_client
-                 ];
+                ];
                 var formattedInsertUserQuery = mysql.format(insertUserSql, userParams);
-
+                
                 var insertUserQuery = await new Promise((resolve, reject) => {
                     connection.query(formattedInsertUserQuery, function (err, results) {
                         if (err) {
                             new Error('There was an issue with the update user SQL statement');
                             reject();
                         }
-
+                        
                         response.body.results = {
                             user_id: event.body.user_id,
                             full_name: event.body.full_name,

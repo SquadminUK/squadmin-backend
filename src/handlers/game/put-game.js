@@ -184,17 +184,17 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
                                 throw new Error("There was an issue with the UpdateInvite SQL Statement");
                             }
                         });
-
+                        
                         if (index === array.length - 1) {
                             connection.commit(function(err) {
                                 if (err) {
                                     throw new Error('SQL Statement commit error');
                                 }
-
+                                
                                 resolve();
                             });
                         }
-
+                        
                     });
                 });
             });  
@@ -202,21 +202,22 @@ exports.putGameByIdHandler = async (event, context, callback, connection) => {
             return badRequestResponse(exception.message);
         }
     }
-
+    
     function removeUninvitedFromResponse(value) {
         response.body.results.invitedPlayers = response.body.results.invitedPlayers.filter(function (invite) {
             return invite.mobile_number !== value['mobile_number'];
         });
     }
     
-    if (connection === undefined) {
+    if (connection === undefined) { 
+        var stageVars = event.stageVariables;
         connection = mysql.createConnection({
             connectionLimit: 10,
-            host: process.env.RDS_HOSTNAME,
-            user: process.env.RDS_USERNAME,
-            password: process.env.RDS_PASSWORD,
-            port: process.env.RDS_PORT,
-            database: process.env.RDS_DATABASE,
+            host: stageVars.rds_hostname,
+            user: stageVars.rds_username,
+            password: stageVars.rds_password,
+            port: stageVars.rds_port,
+            database: stageVars.rds_database,
             multipleStatements: true
         });            
     }
