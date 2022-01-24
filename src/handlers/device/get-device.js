@@ -2,7 +2,8 @@ const mysql = require('mysql');
 
 exports.getDeviceHandler = async (event, context, callback, connection) => {
 
-    console.log(`Stage Vars: ${event.stageVariables}`);
+    console.log(`Stage Vars: ${event.stageVariables.rds_hostname}`);
+    console.log(`Stage Vars: ${event.stageVariables.rds_username}`);
 
     var response = {
         headers: {},
