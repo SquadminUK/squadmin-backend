@@ -7,7 +7,7 @@
         "aws-sdk": "^2.660.0",
         "mysql": "2.18.1",
         "rxjs": "^7.4.0",
-        "salted-sha256": "1.0.0",
+        "salt-sha256": "^1.0.0",
         "uuidv4": "^6.2.12"
     },
     "devDependencies": {
