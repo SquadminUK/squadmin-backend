@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const saltedSha256 = require('salted-sha256');
+const saltedSha256 = require('salt-sha256');
 
 function encrypted(plainStringPassword) {
     const hashedPassword = saltedSha256(plainStringPassword, process.env.HASHING_SALT);
