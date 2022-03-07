@@ -78,13 +78,20 @@ exports.postUserHandler = async (event, context, callback, connection) => {
             
             try {
                 var insertUserSql = "INSERT INTO User (user_id, full_name, email_address, mobile_number, password, username, date_of_birth, date_created, signed_up_via_social, has_registered_via_client) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                const passwordOrNull = encrypted(event.body.password) ?? null
+                var password = event.body.password;
+                
+                if (password) {
+                    password = encrypted(event.body.password);
+                } else {
+                    password = null;
+                }
+
                 var userParams = [
                     event.body.user_id, 
                     event.body.full_name, 
                     event.body.email_address, 
                     event.body.mobile_number, 
-                    passwordOrNull, 
+                    password, 
                     event.body.username, 
                     event.body.date_of_birth, 
                     event.body.date_created, 
