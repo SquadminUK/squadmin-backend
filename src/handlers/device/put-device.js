@@ -28,14 +28,14 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
     var userId = '';
     
     if (connection === undefined) { 
-        var stageVars = event.stageVariables;
+        ;
         connection = mysql.createConnection({
             connectionLimit: 10,
-            host: stageVars.rds_hostname,
-            user: stageVars.rds_username,
-            password: stageVars.rds_password,
-            port: stageVars.rds_port,
-            database: stageVars.rds_database
+            host: process.env.RDS_HOSTNAME,
+            user: process.env.RDS_USERNAME,
+            password: process.env.RDS_PASSWORD,
+            port: process.env.RDS_PORT,
+            database: process.env.RDS_DATABASE
         });
     }
     
