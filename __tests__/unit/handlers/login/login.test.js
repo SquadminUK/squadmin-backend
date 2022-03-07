@@ -60,6 +60,8 @@ describe('Test postLoginHandler', () => {
                 password: 'password'
             }
         };
+
+       event.body = JSON.stringify(event.body);
         
         const result = await lambda.postLoginHandler(event, context, callback, mysql);
         
@@ -96,6 +98,8 @@ describe('Test postLoginHandler', () => {
                 }
             };
             
+            event.body = JSON.stringify(event.body);
+
             const result = await lambda.postLoginHandler(event, context, callback, mysql);
             
             const expectedResult = {
