@@ -55,7 +55,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                         response = badRequest;
                         reject('Failed to connect');
                     }
-                    
+
                     resolve();
                 })
             })
@@ -111,5 +111,6 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
     }
     
     response.body = JSON.stringify(response.body);
+    
     return response;
 }
