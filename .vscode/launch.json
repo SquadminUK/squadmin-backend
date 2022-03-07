@@ -3,6 +3,34 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:postUserLoginFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "postUserLoginFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "POST",
+                        "body": {
+                                "password": "c4f0c5f8de56cfed869c2c78d31b86d165e01d3a6258c34b5f7e8c725a384b6a",
+                                "user_id": "1e7bfcc7-b24a-4ac9-bb6a-61b1affb4c4b"
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:putGameByIdFunction",
             "invokeTarget": {
                 "target": "template",
@@ -37,7 +65,7 @@
                                     "response_id": "d1c7962d-b2d4-446f-9495-1a7e448e225b",
                                     "mobile_number": "+44 7931 654 321",
                                     "has_been_uninvited": true
-                                }, 
+                                },
                                 {
                                     "organised_game_id": "228ed77b-4c32-4b84-bfda-cf4f4c7d64ee",
                                     "response_id": "48fd6b63-2290-4293-9e36-ae19c19babc1",
