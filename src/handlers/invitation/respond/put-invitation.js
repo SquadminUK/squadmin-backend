@@ -26,7 +26,6 @@ exports.putInvitationHandler = async (event, context, callback, connection) => {
     var invitationId = '';
     
     if (connection === undefined) { 
-        ;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: process.env.RDS_HOSTNAME,
