@@ -42,6 +42,10 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
         if (httpMethod !== 'POST') {
             throw new Error(`postLoginHandler only accepts POST method, you tried: ${httpMethod}`);
         }
+
+        if (event.body) {
+            event.body = JSON.parse(event.body);
+        }
     } catch (exception) {
         badRequest.reason = exception.message;
         return badRequest;
