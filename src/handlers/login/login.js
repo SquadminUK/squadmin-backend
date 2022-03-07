@@ -65,7 +65,9 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                 var getUserSql = "SELECT * FROM User WHERE user_id = ?";
                 var userParams = event.body.user_id;
                 var formattedGetUserQuery = mysql.format(getUserSql, userParams);
-                
+               
+                console.log(`DB Query = ${formattedGetUserQuery})`);
+
                 await new Promise((resolve, reject) => {
                     connection.query(formattedGetUserQuery, function(err, results) {
                         if (err) {

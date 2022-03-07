@@ -67,8 +67,6 @@ exports.getDeviceHandler = async (event, context, callback, connection) => {
                 var userDeviceId = event.pathParameters.id;
                 var formattedGetDeviceQuery = mysql.format(getDeviceSql, userDeviceId);
 
-                console.log(`DB Query = ${formattedGetDeviceQuery})`);
-
                 var getDeviceQuery = await new Promise((resolve, reject) => { 
                     connection.query(formattedGetDeviceQuery, function(err, results) {
                         if (err) {
