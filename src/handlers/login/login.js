@@ -52,10 +52,11 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
             await new Promise((resolve, reject) => {
                 connection.connect(function (err) {
                     if (err) {
+                        console.log("failed to connect to DB");
                         response = badRequest;
                         reject('Failed to connect');
                     }
-                    
+                    console.log("connected to DB");
                     resolve();
                 })
             })
@@ -73,7 +74,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                         }
                         
                         var userSubmittedPassword = event.body.password;
-                        
+                        console.log(`Results: ${results}`);
                         if (results.length > 0) {
                             var retrievedUser = results[0];
                             if (retrievedUser.password === userSubmittedPassword) {
@@ -92,9 +93,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                                 response.reason = "Failed to login";
                                 throw new Error('Failed to login');
                             }
-                        } else {
-                            
-                        } 
+                        }
                         
                         connection.end();
                         resolve();
