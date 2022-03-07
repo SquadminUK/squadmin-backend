@@ -114,7 +114,6 @@ exports.getGamesHandler = async(event, context, callback, connection) => {
     }
     
     if (connection === undefined) { 
-        ;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: process.env.RDS_HOSTNAME,

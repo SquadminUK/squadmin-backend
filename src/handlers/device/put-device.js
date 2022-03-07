@@ -28,7 +28,6 @@ exports.putDeviceHandler = async (event, context, callback, connection) => {
     var userId = '';
     
     if (connection === undefined) { 
-        ;
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: process.env.RDS_HOSTNAME,
