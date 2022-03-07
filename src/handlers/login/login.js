@@ -55,6 +55,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                         response = badRequest;
                         reject('Failed to connect');
                     }
+                    console.log("connected to db");
                     resolve();
                 })
             })
@@ -72,6 +73,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                         }
                         
                         var userSubmittedPassword = event.body.password;
+                        console.log(`got ${results.length} records`);
                         var retrievedUser = results[0];
                         if (retrievedUser.password === userSubmittedPassword) {
                             response.body.results.user_id = retrievedUser.user_id;
