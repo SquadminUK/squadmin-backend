@@ -55,7 +55,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                         response = badRequest;
                         reject('Failed to connect');
                     }
-
+                    
                     resolve();
                 })
             })
@@ -74,23 +74,28 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                         
                         var userSubmittedPassword = event.body.password;
                         
-                        var retrievedUser = results[0];
-                        if (retrievedUser.password === userSubmittedPassword) {
-                            response.body.results.user_id = retrievedUser.user_id;
-                            response.body.results.full_name = retrievedUser.full_name;
-                            response.body.results.email_address = retrievedUser.email_address;
-                            response.body.results.mobile_number = retrievedUser.mobile_number;
-                            response.body.results.password = retrievedUser.password;
-                            response.body.results.username = retrievedUser.username;
-                            response.body.results.date_of_birth = retrievedUser.date_of_birth;
-                            response.body.results.date_created = retrievedUser.date_created;
-                            response.body.results.date_modified = retrievedUser.date_modified;
-                            response.body.results.signed_up_via_social = retrievedUser.signed_up_via_social;
+                        if (results.length > 0) {
+                            var retrievedUser = results[0];
+                            if (retrievedUser.password === userSubmittedPassword) {
+                                response.body.results.user_id = retrievedUser.user_id;
+                                response.body.results.full_name = retrievedUser.full_name;
+                                response.body.results.email_address = retrievedUser.email_address;
+                                response.body.results.mobile_number = retrievedUser.mobile_number;
+                                response.body.results.password = retrievedUser.password;
+                                response.body.results.username = retrievedUser.username;
+                                response.body.results.date_of_birth = retrievedUser.date_of_birth;
+                                response.body.results.date_created = retrievedUser.date_created;
+                                response.body.results.date_modified = retrievedUser.date_modified;
+                                response.body.results.signed_up_via_social = retrievedUser.signed_up_via_social;
+                            } else {
+                                response = badRequest;
+                                response.reason = "Failed to login";
+                                throw new Error('Failed to login');
+                            }
                         } else {
-                            response = badRequest;
-                            response.reason = "Failed to login";
-                            throw new Error('Failed to login');
-                        }
+                            
+                        } 
+                        
                         connection.end();
                         resolve();
                     });
