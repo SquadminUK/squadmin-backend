@@ -93,6 +93,7 @@ describe('Test postUserHandler', () => {
                 email_address: 'email_address',
                 mobile_number: 'mobile_number',
                 username: 'username',
+                password: 'password',
                 date_of_birth: 'date_of_birth',
                 date_created: 'date_created',
                 signed_up_via_social: true,
@@ -115,6 +116,7 @@ describe('Test postUserHandler', () => {
                     username: 'username',
                     date_of_birth: 'date_of_birth',
                     date_created: 'date_created',
+                    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
                     signed_up_via_social: true,
                     has_registered_via_client: true
                 }
