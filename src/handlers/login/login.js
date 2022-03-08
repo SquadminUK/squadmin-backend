@@ -15,7 +15,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                 date_of_birth: '',
                 date_created: '',
                 date_modified: '',
-                signed_up_via_social: true
+                signed_up_via_social: ''
             }
         }
     };
@@ -94,7 +94,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
                                 response.body.results.date_of_birth = retrievedUser.date_of_birth;
                                 response.body.results.date_created = retrievedUser.date_created;
                                 response.body.results.date_modified = retrievedUser.date_modified;
-                                response.body.results.signed_up_via_social = retrievedUser.signed_up_via_social;
+                                response.body.results.signed_up_via_social = Boolean(retrievedUser.signed_up_via_social);
                             } else {
                                 response = badRequest;
                                 response.reason = "Failed to login";
