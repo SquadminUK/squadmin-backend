@@ -342,3 +342,24 @@ Resources:
             Path: /user/login
             Method: POST
   
+  postUserLoginViaEmailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/login/login-via-email.postLoginViaEmailHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Description: A function used to login a user via email and password
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /user/login-via-email
+            Method: POST

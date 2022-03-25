@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 
-exports.postLoginHandler = async (event, context, callback, connection) => {
+exports.postLoginViaEmailHandler = async (event, context, callback, connection) => {
     
     var response = {
         statusCode: 200,
@@ -40,7 +40,7 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
     const { httpMethod } = event;
     try {
         if (httpMethod !== 'POST') {
-            throw new Error(`postLoginHandler only accepts POST method, you tried: ${httpMethod}`);
+            throw new Error(`postLoginViaEmailHandler only accepts POST method, you tried: ${httpMethod}`);
         }
 
         if (event.body) {
@@ -64,10 +64,10 @@ exports.postLoginHandler = async (event, context, callback, connection) => {
             })
             
             try { 
-                var getUserSql = "SELECT * FROM User WHERE user_id = ?";
-                var userParams = event.body.user_id;
+                var getUserSql = "SELECT * FROM User WHERE email = ?";
+                var userParams = event.body.email_address;
                 var formattedGetUserQuery = mysql.format(getUserSql, userParams);
-               
+
                 await new Promise((resolve, reject) => {
                     connection.query(formattedGetUserQuery, function(err, results) {
                         if (err) {
