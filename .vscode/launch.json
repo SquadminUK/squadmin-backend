@@ -3,6 +3,34 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:postUserLoginViaEmailFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "postUserLoginViaEmailFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "POST",
+                        "body": {
+                            "password": "c4f0c5f8de56cfed869c2c78d31b86d165e01d3a6258c34b5f7e8c725a384b6a",
+                            "email_address": "jamilnawaz88@gmail.com"
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:postUserLoginFunction",
             "invokeTarget": {
                 "target": "template",
@@ -14,8 +42,8 @@
                     "json": {
                         "httpMethod": "POST",
                         "body": {
-                                "password": "c4f0c5f8de56cfed869c2c78d31b86d165e01d3a6258c34b5f7e8c725a384b6a",
-                                "user_id": "1e7bfcc7-b24a-4ac9-bb6a-61b1affb4c4b"
+                            "password": "c4f0c5f8de56cfed869c2c78d31b86d165e01d3a6258c34b5f7e8c725a384b6a",
+                            "user_id": "1e7bfcc7-b24a-4ac9-bb6a-61b1affb4c4b"
                         }
                     }
                 },
