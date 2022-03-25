@@ -43,7 +43,7 @@ exports.postLoginViaEmailHandler = async (event, context, callback, connection) 
             throw new Error(`postLoginViaEmailHandler only accepts POST method, you tried: ${httpMethod}`);
         }
 
-        if (typeof event.body === 'string') {
+        if (event.body) {
             event.body = JSON.parse(event.body);
         }
     } catch (exception) {
