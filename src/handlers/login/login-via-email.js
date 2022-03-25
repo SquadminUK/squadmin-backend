@@ -64,7 +64,7 @@ exports.postLoginViaEmailHandler = async (event, context, callback, connection) 
             })
             
             try { 
-                var getUserSql = "SELECT * FROM User WHERE email = ?";
+                var getUserSql = "SELECT * FROM User WHERE email_address = ?";
                 var userParams = event.body.email_address;
                 var formattedGetUserQuery = mysql.format(getUserSql, userParams);
 
