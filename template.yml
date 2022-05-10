@@ -118,7 +118,7 @@ Resources:
         Api:
           Type: Api
           Properties:
-            Path: /games
+            Path: /games/{user_id}
             Method: GET
 
   getDeviceByIdFunction:
