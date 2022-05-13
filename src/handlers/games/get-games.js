@@ -26,9 +26,6 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
     async function fetchCreatedGames() {
         try {
             return new Promise((resolve, reject) => {
-                // var getGamesSql = `SELECT * FROM OrganisedGame Game 
-                //                     INNER JOIN GameInvitation Invitation ON Invitation.organised_game_id = Game.game_id 
-                //                     WHERE Game.organising_player = ? AND Game.event_date > now()`;
                 var getGamesSql = `SELECT Game.*, Invitation.*, userTable.id, userTable.user_id, userTable.full_name, userTable.email_address, userTable.email_address, userTable.mobile_number, userTable.username
                                     FROM OrganisedGame Game 
                                     INNER JOIN GameInvitation Invitation ON Invitation.organised_game_id = Game.game_id 
@@ -65,8 +62,14 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
 
                         const users = retrievedDetails.pipe(map((user) => user.userTable)).subscribe(UserDetails => {
                             const games = response.body.results.organisedGames
-                            const invitedPlayers = games.invitedPlayers
-                            console.log(UserDetails)
+                            games.forEach(function (game, index, array) {
+                                const invites = game.invitedPlayers
+                                invites.forEach(function (invite, index, array){
+                                    if (invite.user_id == UserDetails.user_id) {
+                                        invite.user_details = UserDetails
+                                    }
+                                })
+                            })
                         });
 
 
@@ -83,7 +86,6 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
     async function fetchInvitedToGames() {
         try {
             return new Promise((resolve, reject) => {
-                // var getInvitationsSQL = "SELECT * FROM GameInvitation Invitation INNER JOIN OrganisedGame Game ON Game.game_id = Invitation.organised_game_id WHERE Invitation.user_id = ? AND Game.event_date > now()";
 
                 var getInvitationsSQL = `SELECT Invitation.id, Invitation.response_id, Invitation.can_play, Invitation.date_modified, Invitation.has_been_uninvited, Invitation.organised_game_id, Invitation.user_id, 
                 Game.id, Game.game_id, Game.venue, Game.location, Game.event_date, Game.date_created, Game.date_modified, Game.organising_player, Game.is_active, 
