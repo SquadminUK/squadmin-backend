@@ -81,6 +81,14 @@ describe('Test getGamesHandler', () => {
                     date_modified: 'date_modified',
                     organised_game_id: 'game_id',
                     user_id: 'user_id',
+                },
+                userTable: {
+                    id: 'id',
+                    user_id: 'user_id',
+                    full_name: 'full_name',
+                    email_address: 'email_address',
+                    mobile_number: 'mobile_number',
+                    username: 'username'
                 }
             }
         ]));
@@ -105,6 +113,14 @@ describe('Test getGamesHandler', () => {
                     date_modified: 'date_modified',
                     organised_game_id: 'game_id',
                     user_id: 'user_id',
+                },
+                userTable: {
+                    id: 'id',
+                    user_id: 'user_id',
+                    full_name: 'full_name',
+                    email_address: 'email_address',
+                    mobile_number: 'mobile_number',
+                    username: 'username'
                 }
             }
         ]));
@@ -158,7 +174,15 @@ describe('Test getGamesHandler', () => {
                                 "can_play": "can_play",
                                 "date_modified": "date_modified",
                                 "organised_game_id": "game_id",
-                                "user_id": "user_id" 
+                                "user_id": "user_id",
+                                "user_details": {
+                                    "id": "id",
+                                    "user_id": "user_id",
+                                    "full_name": "full_name",
+                                    "email_address": "email_address",
+                                    "mobile_number": "mobile_number",
+                                    "username": "username"
+                                }
                             }
                         }
                     ]
