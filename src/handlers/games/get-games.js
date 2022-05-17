@@ -53,6 +53,7 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
                                     if (!value['invitedPlayers']) {
                                         games[index].invitedPlayers = new Array();
                                     }
+                                    Invitation.can_play = Boolean(Invitation.can_play);
                                     games[index].invitedPlayers.push(Invitation);
                                 }
                             });
