@@ -107,6 +107,7 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
                         results.forEach(function (value, index, array) {
                             const game = value.Game;
                             game.invitation = value.Invitation;
+                            game.invitation.can_play = Boolean(value.Invitation.can_play);
                             game.invitation.invitingPlayer = value.userTable;
                             response.body.results.invitedToGames.push(game);
                         });
