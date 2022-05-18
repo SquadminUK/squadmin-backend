@@ -88,7 +88,7 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
         try {
             return new Promise((resolve, reject) => {
 
-                var getInvitationsSQL = `SELECT Invitation.id, Invitation.response_id, Invitation.can_play, Invitation.date_modified, Invitation.has_been_uninvited, Invitation.organised_game_id, Invitation.user_id, 
+                var getInvitationsSQL = `SELECT Invitation.id, Invitation.response_id, Invitation.can_play, Invitation.date_modified, Invitation.date_responded, Invitation.has_been_uninvited, Invitation.organised_game_id, Invitation.user_id, 
                 Game.id, Game.game_id, Game.venue, Game.location, Game.event_date, Game.date_created, Game.date_modified, Game.organising_player, Game.is_active, 
                 userTable.id, userTable.user_id, userTable.full_name, userTable.email_address, userTable.mobile_number, userTable.username FROM GameInvitation Invitation 
                     INNER JOIN OrganisedGame Game ON Game.game_id = Invitation.organised_game_id 
