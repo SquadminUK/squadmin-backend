@@ -67,10 +67,10 @@ describe('Test postUserHandler', () => {
         done();
     });
     
-    it('should successfully insert user details', async done => {
+    it(`should successfully insert user details when they're not registered`, async done => {
         
         mysql.connect = jest.fn().mockImplementation((callback) => callback());
-        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
+        mysql.query = jest.fn().mockImplementationOnce((query, callback) => callback(null, [])).mockImplementationOnce((query, callback) => callback(null, [
             {
                 user_id: 'user_id',
                 full_name: 'full_name',
@@ -83,8 +83,8 @@ describe('Test postUserHandler', () => {
                 signed_up_via_social: true,
                 has_registered_via_client: true
             }
-        ])),
-
+        ])),        
+        
         event = {
             httpMethod: 'POST',
             body: {
@@ -100,7 +100,7 @@ describe('Test postUserHandler', () => {
                 has_registered_via_client: true
             }
         };
-
+        
         event.body = JSON.stringify(event.body);
         
         const result = await lambda.postUserHandler(event, context, callback, mysql);
@@ -124,9 +124,57 @@ describe('Test postUserHandler', () => {
         }
         
         expectedResult.body = JSON.stringify(expectedResult.body);
-
+        
         expect(result).toEqual(expectedResult);
         done();
+    });
+    
+    it(`should successfully retrieve a user and then update and return user details`, async done => {
+        mysql.connect = jest.fn().mockImplementation((callback) => callback());
+        mysql.query = jest.fn().mockImplementationOnce((query, callback) => callback(null, [{
+            user_id: 'user_id',
+            email_address: 'email_address',
+            mobile_number: 'mobile_number',
+            date_created: 'date_created',
+        }])),
+
+        event = {
+            httpMethod: 'POST',
+            body: {
+                user_id: 'user_id',
+                full_name: 'full_name',
+                email_address: 'email_address',
+                mobile_number: 'mobile_number',
+                username: 'username',
+                password: 'password',
+                date_of_birth: 'date_of_birth',
+                date_created: 'date_created',
+                signed_up_via_social: true,
+                has_registered_via_client: true
+            }
+        };
+
+        event.body = JSON.stringify(event.body);
+        
+        const result = await lambda.postUserHandler(event, context, callback, mysql);
+
+        const expectedResult = {
+            statusCode: 200,
+            body: {
+                results: {
+                    user_id: 'user_id',
+                    full_name: 'full_name',
+                    email_address: 'email_address',
+                    mobile_number: 'mobile_number',
+                    username: 'username',
+                    date_of_birth: 'date_of_birth',
+                    date_created: 'date_created',
+                    password: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8',
+                    signed_up_via_social: true,
+                    has_registered_via_client: true
+                }
+            }
+        }
     });
     
 });
