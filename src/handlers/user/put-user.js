@@ -76,8 +76,8 @@ exports.putUserHandler = async (event, context, callback, connection) => {
             });
             
             try {
-                var putUserSql = "UPDATE User SET full_name = ?, email_address = ?, mobile_number = ?, date_of_birth = ?, date_modified = ? WHERE user_id = ?";
-                var userId = [event.body.full_name, event.body.email_address, event.body.mobile_number, event.body.date_of_birth, event.body.date_modified, userId];
+                var putUserSql = "UPDATE User SET full_name = ?, email_address = ?, mobile_number = ?, date_of_birth = ?, date_modified = now() WHERE user_id = ?";
+                var userId = [event.body.full_name, event.body.email_address, event.body.mobile_number, event.body.date_of_birth, userId];
                 var formattedUpdateUserQuery = mysql.format(putUserSql, userId);
                 
                 var updateUserQuery = await new Promise((resolve, reject) => {
