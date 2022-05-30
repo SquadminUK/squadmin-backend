@@ -5,7 +5,7 @@ const { map } = require('rxjs/operators');
 
 exports.getGamesHandler = async (event, context, callback, connection) => {
 
-    var response = {
+    let response = {
         statusCode: 200,
         body: {
             results: {
@@ -15,18 +15,18 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
         }
     };
 
-    var badRequest = {
+    const badRequest = {
         statusCode: 400,
         message: 'Bad request',
         reason: null
     };
 
-    var userId = undefined;
+    let userId = undefined;
 
     async function fetchCreatedGames() {
         try {
             return new Promise((resolve, reject) => {
-                var getGamesSql = `SELECT Game.*, Invitation.*, userTable.id, userTable.user_id, userTable.full_name, userTable.email_address, userTable.email_address, userTable.mobile_number, userTable.username
+                const getGamesSql = `SELECT Game.*, Invitation.*, userTable.id, userTable.user_id, userTable.full_name, userTable.email_address, userTable.email_address, userTable.mobile_number, userTable.username
                                     FROM OrganisedGame Game 
                                     INNER JOIN GameInvitation Invitation ON Invitation.organised_game_id = Game.game_id 
                                     INNER JOIN User userTable ON Invitation.user_id = userTable.user_id
@@ -72,8 +72,8 @@ exports.getGamesHandler = async (event, context, callback, connection) => {
                                 })
                             })
                         });
-
-
+                    } else {
+                        resolve();
                     }
                 });
             });

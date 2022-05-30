@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-var lamda = require('../../../../src/handlers/games/get-games');
+var lambda = require('../../../../src/handlers/games/get-games');
 
 var event, context, callback;
 
@@ -26,7 +26,7 @@ describe('Test getGamesHandler', () => {
             }
         };
         
-        const result = await lamda.getGamesHandler(event, context, callback, mysql);
+        const result = await lambda.getGamesHandler(event, context, callback, mysql);
         
         const expectedResult = {
             "message": "Bad request", 
@@ -47,7 +47,7 @@ describe('Test getGamesHandler', () => {
             }
         };
         
-        const result = await lamda.getGamesHandler(event, context, callback, mysql);
+        const result = await lambda.getGamesHandler(event, context, callback, mysql);
         
         const expectedResult = {
             "message": "Bad request", 
@@ -92,7 +92,6 @@ describe('Test getGamesHandler', () => {
                 }
             }
         ]));
-        
         mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
             {
                 Game: {
@@ -132,7 +131,7 @@ describe('Test getGamesHandler', () => {
             }
         };
         
-        const result = await lamda.getGamesHandler(event, context, callback, mysql);
+        const result = await lambda.getGamesHandler(event, context, callback, mysql);
         
         const expectedResult = {
             statusCode: 200,
@@ -202,6 +201,35 @@ describe('Test getGamesHandler', () => {
         expectedResult.body = JSON.stringify(expectedResult.body);
         expect(result).toEqual(expectedResult);
         
+        done();
+    });
+
+    it(`should return empty arrays for organised and invited to games when no game data`, async done => {
+        mysql.query = jest.fn()
+            .mockImplementationOnce((query, callback) => callback(null, []))
+            .mockImplementationOnce((query, callback) => callback(null, []))
+
+        event = {
+            httpMethod: 'GET',
+            pathParameters: {
+                'id': 'user_id'
+            }
+        };
+
+        const result = await lambda.getGamesHandler(event, context, callback, mysql);
+
+        const expectedResult = {
+            statusCode: 200,
+            body: {
+                results: {
+                    organisedGames: [],
+                    invitedToGames: []
+                }
+            }
+        }
+
+        expectedResult.body = JSON.stringify(expectedResult.body);
+        expect(result).toEqual(expectedResult);
         done();
     });
 });
