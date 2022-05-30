@@ -24,27 +24,27 @@ exports.postUserHandler = async (event, context, callback, connection) => {
             }
         }
     }
-    
+
     var badRequest = {
         statusCode: 400,
         message: 'Bad request',
         reason: null
     };
-    
+
     var noUserFound = {
         statusCode: 200,
         body: {
             results: [],
             message: ''
-        } 
+        }
     };
-    
+
     async function checkIfUserExists() {
         return await new Promise((resolve, reject) => {
             var userSqlQuery = `SELECT * FROM User WHERE email_address = ?`;
             var formattedUserSQLQuery = mysql.format(userSqlQuery, event.body.email_address);
-            
-            connection.query(formattedUserSQLQuery, function(err, results) {
+
+            connection.query(formattedUserSQLQuery, function (err, results) {
                 if (err) {
                     reject('post-user: SQL Query error');
                 }
@@ -56,9 +56,9 @@ exports.postUserHandler = async (event, context, callback, connection) => {
             })
         });
     }
-    
+
     async function insertUser() {
-        
+
         try {
             return await new Promise((resolve, reject) => {
                 var insertUserSql = `INSERT INTO User (
@@ -73,22 +73,22 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                     signed_up_via_social, 
                     has_registered_via_client) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
                 var password = event.body.password;
-                
+
                 if (password) {
                     password = encrypted(event.body.password);
                 } else {
                     password = null;
                 }
-                
+
                 var userParams = [
-                    event.body.user_id, 
-                    event.body.full_name, 
-                    event.body.email_address, 
-                    event.body.mobile_number, 
-                    password, 
-                    event.body.username, 
-                    event.body.date_of_birth, 
-                    event.body.date_created, 
+                    event.body.user_id,
+                    event.body.full_name,
+                    event.body.email_address,
+                    event.body.mobile_number,
+                    password,
+                    event.body.username,
+                    event.body.date_of_birth,
+                    event.body.date_created,
                     event.body.signed_up_via_social,
                     event.body.has_registered_via_client
                 ];
@@ -98,7 +98,7 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                         new Error('There was an issue with the update user SQL statement');
                         reject();
                     }
-                    
+
                     response.body.results = {
                         user_id: event.body.user_id,
                         full_name: event.body.full_name,
@@ -132,14 +132,16 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                 date_of_birth = ?,
                 date_created = now(),
                 signed_up_via_social = ?,
-                has_registered_via_client = ?`;
+                has_registered_via_client = ?
+                WHERE mobile_number = ?`;
                 var formattedUpdateQuery = mysql.format(updateUserQuery, [
                     event.body.full_name,
                     event.body.mobile_number,
-                    event.body.username, 
+                    event.body.username,
                     event.body.date_of_birth,
                     event.body.signed_up_via_social,
-                    event.body.has_registered_via_client
+                    event.body.has_registered_via_client,
+                    event.body.mobile_number
                 ]);
 
                 connection.query(formattedUpdateQuery, function (err, results) {
@@ -158,10 +160,42 @@ exports.postUserHandler = async (event, context, callback, connection) => {
     }
 
     async function retrieveUserDetails() {
-        //TODO: implement
+        try {
+            return await new Promise((resolve, reject) => {
+                let getUserQuery = `SELECT * FROM User WHERE mobile_number = ?`;
+                let formattedQuery = mysql.format(getUserQuery, event.body.mobile_number);
+                connection.query(formattedQuery, function (err, results) {
+                    if (err) {
+                        throw new Error("There was an issue with retrieving user details");
+                    }
+
+                    if (results.length > 0) {
+                        let user = results[0];
+                        let responseBody = response.body.results;
+                        responseBody.user_id = user['user_id'];
+                        responseBody.full_name = user['full_name'];
+                        responseBody.email_address = user['email_address'];
+                        responseBody.mobile_number = user['mobile_number'];
+                        responseBody.username = user['username'];
+                        responseBody.date_of_birth = user['date_of_birth'];
+                        responseBody.date_created = user['date_created'];
+                        responseBody.date_modified = user['date_modified'];
+                        responseBody.password = user['password'];
+                        responseBody.signed_up_via_social = user['signed_up_via_social'];
+                        responseBody.has_registered_via_client = user['has_registered_via_client'];
+                        response.body.results = responseBody;
+                        resolve();
+                    }
+                });
+            });
+        } catch (e) {
+            connection.end();
+            badRequest.reason = e.message;
+            return badRequest;
+        }
     }
-    
-    if (connection === undefined) { 
+
+    if (connection === undefined) {
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: process.env.RDS_HOSTNAME,
@@ -171,21 +205,21 @@ exports.postUserHandler = async (event, context, callback, connection) => {
             database: process.env.RDS_DATABASE
         });
     }
-    
+
     try {
-        const { httpMethod } = event;
+        const {httpMethod} = event;
         if (event.body) {
             event.body = JSON.parse(event.body);
         }
         if (httpMethod != 'POST') {
             throw new Error(`postUserHandler only accepts POST method, you tried: ${httpMethod}`);
         }
-        
+
     } catch (exception) {
         badRequest.reason = exception.message;
         return badRequest;
     }
-    
+
     try {
         if (connection.state === 'disconnected') {
             await new Promise((resolve, reject) => {
@@ -194,17 +228,17 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                         response = badRequest;
                         reject('Failed to connect');
                     }
-                    
+
                     checkIfUserExists().then((userDetails) => {
-                        
+
                         if (userDetails != null) {
-                            updateUserDetails(userDetails).then( () => {
-                                retrieveUserDetails().then( () => {
+                            updateUserDetails(userDetails).then(() => {
+                                retrieveUserDetails().then(() => {
                                     resolve();
                                 });
                             })
                         } else {
-                            insertUser().then( () => {
+                            insertUser().then(() => {
                                 resolve();
                             });
                         }
@@ -218,7 +252,7 @@ exports.postUserHandler = async (event, context, callback, connection) => {
         response.reason = exception.message;
         return response;
     }
-    
+
     response.body = JSON.stringify(response.body);
     return response;
 }
