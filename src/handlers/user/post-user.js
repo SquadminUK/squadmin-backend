@@ -181,8 +181,8 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                         responseBody.date_created = user['date_created'];
                         responseBody.date_modified = user['date_modified'];
                         responseBody.password = user['password'];
-                        responseBody.signed_up_via_social = user['signed_up_via_social'];
-                        responseBody.has_registered_via_client = user['has_registered_via_client'];
+                        responseBody.signed_up_via_social = Boolean(user['signed_up_via_social']);
+                        responseBody.has_registered_via_client = Boolean(user['has_registered_via_client']);
                         response.body.results = responseBody;
                         resolve();
                     }
