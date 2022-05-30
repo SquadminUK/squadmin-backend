@@ -41,8 +41,8 @@ exports.postUserHandler = async (event, context, callback, connection) => {
 
     async function checkIfUserExists() {
         return await new Promise((resolve, reject) => {
-            var userSqlQuery = `SELECT * FROM User WHERE email_address = ?`;
-            var formattedUserSQLQuery = mysql.format(userSqlQuery, event.body.email_address);
+            var userSqlQuery = `SELECT * FROM User WHERE mobile_number = ?`;
+            var formattedUserSQLQuery = mysql.format(userSqlQuery, event.body.mobile_number);
 
             connection.query(formattedUserSQLQuery, function (err, results) {
                 if (err) {
