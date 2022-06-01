@@ -379,6 +379,8 @@ Resources:
           RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
           RDS_PORT: '3306'
           RDS_DATABASE: 'squadmin-dev'
+          ONE_SIGNAL_AUTH_KEY: 'YThjZTNjNDgtNGFjMS00OTI0LWI0NDgtOTg0Zjc1OWUxMTdj'
+          ONE_SIGNAL_API_KEY: 'M2Y2OTllOTEtNTI4MS00YTE1LTliYTItODk3ZTA1ZTJkMzdj'
       Events:
         Api:
           Type: Api

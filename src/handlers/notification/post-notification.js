@@ -1,6 +1,6 @@
 const OneSignal = require('@onesignal/node-onesignal');
 
-exports.postNotificationHandler = async (event, context, callback) => {
+exports.postNotificationHandler = async (event, context, callback, oneSignal) => {
 
     const app_key_provider = {
         getToken() {
@@ -13,8 +13,8 @@ exports.postNotificationHandler = async (event, context, callback) => {
         }
     };
 
-    console.log(`OS APIKEY ${process.env.ONE_SIGNAL_API_KEY}`);
-    console.log(`OS AUTH KEY ${process.env.ONE_SIGNAL_AUTH_KEY}`);
+    // console.log(`OS API_KEY: ${process.env.ONE_SIGNAL_API_KEY}`);
+    // console.log(`OS AUTH_KEY: ${process.env.ONE_SIGNAL_AUTH_KEY}`);
 
     const configuration = OneSignal.createConfiguration({
         authMethods: {
@@ -64,7 +64,7 @@ exports.postNotificationHandler = async (event, context, callback) => {
         en: ""
     };
     notification.include_external_user_ids = ['892d7e81-a90f-48e4-85b4-11d0d80c51dc'];
-    await client.createNotification(notification);
+    let notificationPostResult = await client.createNotification(notification);
 
     response.body = JSON.stringify(response.body);
     return response;
