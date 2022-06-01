@@ -1,5 +1,5 @@
 const lambda = require('../../../../src/handlers/notification/post-notification');
-var event, context, callback;
+let event, context, callback;
 
 describe('Test postNotificationHandler', () => {
    it('should post a notification to OneSignal', async done => {

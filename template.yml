@@ -255,26 +255,26 @@ Resources:
             Method: GET
 
   getUsersStatusByIdsFunction:
-      Type: AWS::Serverless::Function
-      Properties:
-        CodeUri: ./
-        Handler: src/handlers/users/get-registration-status.getUsersRegistrationStatusHandler
-        Runtime: nodejs14.x
-        MemorySize: 128
-        Description: A function used to get users' details
-        Environment:
-          Variables:
-            RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
-            RDS_USERNAME: 'admin'
-            RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
-            RDS_PORT: '3306'
-            RDS_DATABASE: 'squadmin-dev'
-        Events:
-          Api:
-            Type: Api
-            Properties:
-              Path: /users
-              Method: GET
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: src/handlers/users/get-registration-status.getUsersRegistrationStatusHandler
+      Runtime: nodejs14.x
+      MemorySize: 128
+      Description: A function used to get users' details
+      Environment:
+        Variables:
+          RDS_HOSTNAME: 'squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com'
+          RDS_USERNAME: 'admin'
+          RDS_PASSWORD: 'vrqzpWK4P4J3Pv'
+          RDS_PORT: '3306'
+          RDS_DATABASE: 'squadmin-dev'
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: GET
 
   putInvitationByIdFunction:
     Type: AWS::Serverless::Function
