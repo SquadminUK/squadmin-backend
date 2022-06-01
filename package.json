@@ -4,6 +4,7 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
+        "@onesignal/node-onesignal": "^1.0.0-beta4",
         "aws-sdk": "^2.660.0",
         "mysql": "2.18.1",
         "rxjs": "^7.4.0",
