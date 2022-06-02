@@ -33,6 +33,9 @@ describe('Test postNotificationHandler', () => {
            httpMethod: 'POST'
        }
 
+       process.env.ONE_SIGNAL_API_KEY = "api-key";
+       process.env.ONE_SIGNAL_AUTH_KEY = "auth-key";
+
        const result = await lambda.postNotificationHandler(event, context, callback);
 
        const expectedResult = {
