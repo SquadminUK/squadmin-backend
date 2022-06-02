@@ -34,8 +34,7 @@ jest.mock('mysql', () => ({
 describe('Test getGameHandler', () => {
     
     beforeEach( () => jest.resetModules() );
-    
-    
+
     it('should not accept the POST http method', async done => {
         event = {
             httpMethod: 'POST',

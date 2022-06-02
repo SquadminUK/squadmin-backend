@@ -3,6 +3,8 @@ const oneSignal = require('@onesignal/node-onesignal');
 
 let event, context, callback;
 
+jest.mock('@onesignal/node-onesignal');
+
 describe('Test postNotificationHandler', () => {
 
     it('should only accept a POST request', async done => {

@@ -3,6 +3,27 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:postNotficationFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "postNotficationFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "POST"
+                    }
+                },
+                "environmentVariables": {
+                    "ONE_SIGNAL_AUTH_KEY": "YThjZTNjNDgtNGFjMS00OTI0LWI0NDgtOTg0Zjc1OWUxMTdj",
+                    "ONE_SIGNAL_API_KEY": "M2Y2OTllOTEtNTI4MS00YTE1LTliYTItODk3ZTA1ZTJkMzdj"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:postUserLoginViaEmailFunction",
             "invokeTarget": {
                 "target": "template",
