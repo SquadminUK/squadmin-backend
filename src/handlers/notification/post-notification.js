@@ -13,8 +13,8 @@ exports.postNotificationHandler = async (event, context, callback) => {
         }
     };
 
-    console.log(`OS APIKEY ${process.env.ONE_SIGNAL_API_KEY}`);
-    console.log(`OS AUTH KEY ${process.env.ONE_SIGNAL_AUTH_KEY}`);
+    console.log(`OneSignal API_KEY: ${process.env.ONE_SIGNAL_API_KEY}`);
+    console.log(`OneSignal AUTH_KEY: ${process.env.ONE_SIGNAL_AUTH_KEY}`);
 
     const configuration = OneSignal.createConfiguration({
         authMethods: {

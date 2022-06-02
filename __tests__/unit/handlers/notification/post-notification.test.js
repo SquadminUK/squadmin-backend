@@ -1,4 +1,6 @@
 const lambda = require('../../../../src/handlers/notification/post-notification');
+const oneSignal = require('@onesignal/node-onesignal');
+
 let event, context, callback;
 
 describe('Test postNotificationHandler', () => {
@@ -8,7 +10,7 @@ describe('Test postNotificationHandler', () => {
             httpMethod: 'PUT'
         }
 
-        const result = await lambda.postNotificationHandler(event, context, callback);
+        const result = await lambda.postNotificationHandler(event, context, callback, oneSignal);
 
         const expectedResult = {
             statusCode: 400,
