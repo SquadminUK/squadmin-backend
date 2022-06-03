@@ -87,7 +87,7 @@ exports.postNotificationHandler = async (event, context, callback) => {
             notificationSubtitle = "Let them know if you can make it";
             if (event.body.invited_players !== undefined) {
                 event.body.invited_players.forEach(function (value, index, array) {
-                    externalUserIds.push(value);
+                    externalUserIds.push(value.invited_player_id);
                 });
             }
             break;
