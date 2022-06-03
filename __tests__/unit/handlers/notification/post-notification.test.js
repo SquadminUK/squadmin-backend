@@ -81,7 +81,7 @@ describe('Test postNotificationHandler', () => {
         };
 
         event.body = JSON.stringify(event.body);
-        const result = lambda.postNotificationHandler(event, context, callback, oneSignal);
+        const result = await lambda.postNotificationHandler(event, context, callback, oneSignal);
 
         const expectedResult = {
             statusCode: 200,
@@ -119,7 +119,7 @@ describe('Test postNotificationHandler', () => {
 
 
         event.body = JSON.stringify(event.body);
-        const result = lambda.postNotificationHandler(event, context, callback, oneSignal);
+        const result = await lambda.postNotificationHandler(event, context, callback, oneSignal);
 
         const expectedResult = {
             statusCode: 200,
