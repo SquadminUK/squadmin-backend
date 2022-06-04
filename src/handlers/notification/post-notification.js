@@ -101,8 +101,6 @@ exports.postNotificationHandler = async (event, context, callback) => {
         en: notificationSubtitle
     };
     notification.include_external_user_ids = externalUserIds;
-    // notification.include_external_user_ids = ['892d7e81-a90f-48e4-85b4-11d0d80c51dc'];
-
 
     await client.createNotification(notification);
 

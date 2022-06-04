@@ -35,34 +35,6 @@ describe('Test postNotificationHandler', () => {
 
     });
 
-    it('should post a notification to OneSignal', async done => {
-
-        event = {
-            httpMethod: 'POST',
-            body: {
-                notification_type: 'organised_game'
-            }
-        }
-
-        event.body = JSON.stringify(event.body);
-
-        const result = await lambda.postNotificationHandler(event, context, callback);
-
-        const expectedResult = {
-            statusCode: 200,
-            body: {
-                results: {
-                    message: "Successful request made"
-                }
-            }
-        }
-
-        expectedResult.body = JSON.stringify(expectedResult.body);
-        expect(result).toEqual(expectedResult);
-
-        done();
-    });
-
     it('should post a notification to the organiser when a player response to an invite', async done => {
         event = {
             httpMethod: 'POST',
