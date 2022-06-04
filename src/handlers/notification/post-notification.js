@@ -94,9 +94,9 @@ exports.postNotificationHandler = async (event, context, callback) => {
     notification.contents = {
         en: notificationTitle
     }
-    notification.headings = {
-        en: notificationTitle
-    };
+    // notification.headings = {
+    //     en: notificationTitle
+    // };
     notification.subtitle = {
         en: notificationSubtitle
     };
