@@ -80,7 +80,7 @@ exports.postNotificationHandler = async (event, context, callback) => {
             break;
         }
         case "organised_game": {
-            notificationTitle = `${event.body.inviting_player} has invited you to a game`;
+            notificationTitle = `${event.body.inviting_player.name} has invited you to a game`;
             notificationSubtitle = "Let them know if you can make it";
             if (event.body.invited_players !== undefined) {
                 event.body.invited_players.forEach(function (value, index, array) {
