@@ -207,4 +207,55 @@ describe('Test postUserHandler', () => {
         expect(result).toEqual(expectedResult);
         done();
     });
+
+    it(`should return user details if the person signing in uses apple sign up`, async done => {
+       mysql.connect = jest.fn().mockImplementation((callback) => callback());
+        mysql.query = jest.fn().mockImplementationOnce((query, callback) => callback(null, []))
+            .mockImplementationOnce((query, callback) => callback(null, []))
+            .mockImplementationOnce((query, callback) => callback(null, []))
+
+        event = {
+            httpMethod: 'POST',
+            body: {
+                user_id: 'user_id',
+                full_name: 'full_name',
+                email_address: 'email_address',
+                mobile_number: null,
+                username: null,
+                password: null,
+                date_modified: null,
+                date_of_birth: 'date_of_birth',
+                date_created: 'date_created',
+                signed_up_via_social: true,
+                has_registered_via_client: true
+            }
+        };
+        event.body = JSON.stringify(event.body);
+
+        const result = await lambda.postUserHandler(event, context, callback, mysql);
+
+        const expectedResult = {
+            statusCode: 200,
+            body: {
+                results: {
+                    user_id: 'user_id',
+                    full_name: 'full_name',
+                    email_address: 'email_address',
+                    mobile_number: null,
+                    username: null,
+                    date_of_birth: 'date_of_birth',
+                    date_created: 'date_created',
+                    password: null,
+                    date_modified: null,
+                    signed_up_via_social: true,
+                    has_registered_via_client: true,
+                }
+            }
+        }
+
+        expectedResult.body = JSON.stringify(expectedResult.body);
+
+        expect(result).toEqual(expectedResult);
+        done(); 
+    });
 });

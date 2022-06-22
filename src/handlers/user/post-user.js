@@ -108,6 +108,7 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                         date_of_birth: event.body.date_of_birth,
                         date_created: event.body.date_created,
                         password: password,
+                        date_modified: event.body.date_modified,
                         signed_up_via_social: event.body.signed_up_via_social,
                         has_registered_via_client: event.body.has_registered_via_client
                     };
