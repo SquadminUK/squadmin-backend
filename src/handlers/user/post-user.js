@@ -42,15 +42,23 @@ exports.postUserHandler = async (event, context, callback, connection) => {
     async function checkIfUserExists() {
         return await new Promise((resolve, reject) => {
             var userSqlQuery = `SELECT * FROM User WHERE mobile_number = ?`;
+            if (event.body.mobile_number == null || event.body.mobile_number === undefined) {
+                event.body.mobile_number = ""
+            }
             var formattedUserSQLQuery = mysql.format(userSqlQuery, event.body.mobile_number);
 
             connection.query(formattedUserSQLQuery, function (err, results) {
                 if (err) {
                     reject('post-user: SQL Query error');
                 }
-                if (results.length > 0) {
-                    resolve(results[0]);
-                } else {
+                if (results) {
+                    if (results.length > 0) {
+                        resolve(results[0]);
+                    } else {
+                        resolve();
+                    }
+                }
+                else {
                     resolve(null);
                 }
             })
@@ -97,6 +105,10 @@ exports.postUserHandler = async (event, context, callback, connection) => {
                     if (err) {
                         new Error('There was an issue with the update user SQL statement');
                         reject();
+                    }
+
+                    if (event.body.mobile_number === "") {
+                        event.body.mobile_number = null;
                     }
 
                     response.body.results = {
@@ -209,12 +221,12 @@ exports.postUserHandler = async (event, context, callback, connection) => {
 
     try {
         const {httpMethod} = event;
-        if (event.body) {
-            event.body = JSON.parse(event.body);
-        }
+        
         if (httpMethod != 'POST') {
             throw new Error(`postUserHandler only accepts POST method, you tried: ${httpMethod}`);
         }
+
+        event.body = JSON.parse(event.body);
 
     } catch (exception) {
         badRequest.reason = exception.message;

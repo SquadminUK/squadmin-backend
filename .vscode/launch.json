@@ -3,6 +3,46 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
+            "name": "squadmin-backend:postUserByIdFunction",
+            "invokeTarget": {
+                "target": "template",
+                "templatePath": "${workspaceFolder}/template.yml",
+                "logicalId": "postUserByIdFunction"
+            },
+            "lambda": {
+                "payload": {
+                    "json": {
+                        "httpMethod": "POST",
+                        "pathParameters": {
+                            "id": "30a9234d-780a-4826-9c06-0699483943d0"
+                        },
+                        "body": {
+                            "user_id": "30a9234d-780a-4826-9c06-0699483943d0",
+                            "full_name": "Jamil Nawaz",
+                            "email_address": "jamilnawaz@ymail.com",
+                            "mobile_number": null,
+                            "username": null,
+                            "password": null,
+                            "date_modified": null,
+                            "date_of_birth": "10/11/1988",
+                            "date_created": "2022-06-22'T'18:00:00",
+                            "signed_up_via_social": true,
+                            "has_registered_via_client": true
+                        }
+                    }
+                },
+                "environmentVariables": {
+                    "RDS_HOSTNAME": "squadmin-dev.czq95la7jaml.eu-west-2.rds.amazonaws.com",
+                    "RDS_USERNAME": "admin",
+                    "RDS_PASSWORD": "vrqzpWK4P4J3Pv",
+                    "RDS_PORT": "3306",
+                    "RDS_DATABASE": "squadmin-dev"
+                }
+            }
+        },
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
             "name": "squadmin-backend:postNotficationFunction",
             "invokeTarget": {
                 "target": "template",
