@@ -94,51 +94,6 @@ describe('Test getGameHandler', () => {
     });
     
     it('should retrieve game details by id', async done => {
-
-        mysql.query = jest.fn().mockImplementation((query, callback) => callback(null, [
-            {
-                Game: {
-                    game_id: 'game_id',
-                    venue: 'venue',
-                    location: 'location',
-                    date_created: 'date_created',
-                    date_modified: 'date_modified',
-                    organising_player: 'organising_player',
-                },
-                Invitation: {
-                    organised_game_id: 'organised_game_id',
-                    response_id: 'response_id',
-                    date_responded: 'date_responded',
-                    can_play: 'can_play',
-                    date_modified: 'date_modified',
-                    user_id: 'user_id'
-                },
-                UserTable: {
-                    user_id: 'first_user_id'
-                }
-            },
-            {  Game: {
-                    game_id: 'game_id',
-                    venue: 'venue',
-                    location: 'location',
-                    date_created: 'date_created',
-                    date_modified: 'date_modified',
-                    organising_player: 'organising_player',
-                },
-                Invitation: {
-                    organised_game_id: 'organised_game_id',
-                    response_id: 'response_id',
-                    date_responded: 'date_responded',
-                    can_play: 'can_play',
-                    date_modified: 'date_modified',
-                    user_id: 'user_id'
-                },
-                UserTable: {
-                    user_id: 'second_user_id'
-                }
-            }
-        ]))
-
         event = {
             httpMethod: 'GET',
             pathParameters: {

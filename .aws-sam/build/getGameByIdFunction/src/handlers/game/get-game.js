@@ -84,9 +84,6 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
                         const invites = retrievedDetails.pipe().subscribe((invitation) => {
                             response.body.results.invitedPlayers.push(invitation.Invitation);
                         });
-                        const users = retrievedDetails.pipe().subscribe((user) => {
-                           console.log(user);
-                        });
 
                         resolve();
                     });
