@@ -61,11 +61,23 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
             });
 
             try {
-                var getGameDetailsSql = `SELECT * FROM OrganisedGame Game 
-                                         INNER JOIN GameInvitation Invitation 
-                                         ON Game.game_id = Invitation.organised_game_id
-                                         INNER JOIN User UserTable ON Invitation.user_id = UserTable.user_id 
-                                         WHERE Game.game_id = ?`;
+                var getGameDetailsSql = `SELECT Game.*, 
+                                            Invitation.*, 
+                                            UserTable.user_id, 
+                                            UserTable.full_name, 
+                                            UserTable.email_address, 
+                                            UserTable.mobile_number, 
+                                            UserTable.username, 
+                                            UserTable.date_of_birth, 
+                                            UserTable.date_created,
+                                            UserTable.date_modified,
+                                            UserTable.signed_up_via_social,
+                                            UserTable.has_registered_via_client
+                                            FROM OrganisedGame Game
+                                            INNER JOIN GameInvitation Invitation 
+                                            ON Game.game_id = Invitation.organised_game_id
+                                            INNER JOIN User UserTable ON Invitation.user_id = UserTable.user_id 
+                                            WHERE Game.game_id = ?`;
                 var gameParams = gameId;
                 var formattedGetGameQuery = mysql.format(getGameDetailsSql, gameParams);
 
