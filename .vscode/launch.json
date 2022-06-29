@@ -493,23 +493,6 @@
         {
             "type": "aws-sam",
             "request": "direct-invoke",
-            "name": "API squadmin-backend:getGameByIdFunction",
-            "invokeTarget": {
-                "target": "api",
-                "templatePath": "${workspaceFolder}/template.yml",
-                "logicalId": "getGameByIdFunction"
-            },
-            "api": {
-                "path": "/{id}",
-                "httpMethod": "get",
-                "payload": {
-                    "json": {}
-                }
-            }
-        },
-        {
-            "type": "aws-sam",
-            "request": "direct-invoke",
             "name": "squadmin-backend:getGameByIdFunction",
             "invokeTarget": {
                 "target": "template",

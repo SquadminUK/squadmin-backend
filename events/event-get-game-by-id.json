@@ -1,4 +1,6 @@
 {
     "httpMethod": "GET",
-    "path": "54e0daa6-1c86-4771-a2f0-8d13de05b9ac"
+    "pathParameters": {
+        "id": "60d72672-7d20-4591-ae15-3cd485706b32"
+    }
 }
