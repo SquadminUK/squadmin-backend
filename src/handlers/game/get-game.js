@@ -85,7 +85,13 @@ exports.getGameByIdHandler = async (event, context, callback, connection) => {
                             response.body.results.invitedPlayers.push(invitation.Invitation);
                         });
                         const users = retrievedDetails.pipe().subscribe((user) => {
-                           console.log(user);
+                           var invitedPlayers = response.body.results.invitedPlayers;
+                           invitedPlayers.forEach(function (player, index, array) {
+                               if (player.user_id === user.UserTable.user_id) {
+                                   player.user_details = user.UserTable;
+                               }
+                           });
+                           response.body.results.invitedPlayers = invitedPlayers;
                         });
 
                         resolve();
