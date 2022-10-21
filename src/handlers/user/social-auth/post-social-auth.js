@@ -10,8 +10,10 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
   };
   const badRequest = {
     statusCode: 400,
-    message: 'Bad request',
-    reason: null
+    body: {
+      message: 'Bad request',
+      reason: null
+    }
   };
 
   const isValidEmail = (email) => {
@@ -112,8 +114,9 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
     }
 
   } catch (exception) {
-    badRequest.reason = exception.message;
-    return JSON.stringify(badRequest);
+    badRequest.body.reason = exception.message;
+    badRequest.body = JSON.stringify(badRequest.body);
+    return badRequest;
   }
 
   try {
@@ -141,7 +144,7 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
                 });
               }
             }).catch((exception) => {
-              badRequest.reason = exception;
+              badRequest.body.reason = exception;
               reject(new Error(exception));
             });
 
@@ -153,10 +156,11 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
     (exception) {
     connection.end();
     response = badRequest;
-    response.reason = exception.message;
-    return JSON.stringify(response);
+    response.body.reason = exception.message;
+    response.body = JSON.stringify(response.body);
+    return response;
   }
 
-  response = JSON.stringify(response);
+  response.body = JSON.stringify(response.body);
   return response;
 }
