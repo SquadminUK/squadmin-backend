@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 
 exports.getUserHandler = async (event, context, callback, connection) => {
-    var response = {
+    let response = {
         statusCode: 200,
         body: {
             results: {
@@ -17,22 +17,22 @@ exports.getUserHandler = async (event, context, callback, connection) => {
             }
         }
     }
-    
+
     var badRequest = {
         statusCode: 400,
         message: 'Bad request',
         reason: null
     };
-    
+
     var noUserFound = {
         statusCode: 200,
         body: {
             results: [],
             message: ''
-        } 
+        }
     };
-    
-    if (connection === undefined) { 
+
+    if (connection === undefined) {
         connection = mysql.createConnection({
             connectionLimit: 10,
             host: process.env.RDS_HOSTNAME,
@@ -42,18 +42,18 @@ exports.getUserHandler = async (event, context, callback, connection) => {
             database: process.env.RDS_DATABASE
         });
     }
-    
+
     try {
         if (event.body) {
             event.body = JSON.parse(event.body);
         }
         const { httpMethod } = event;
         const userId = event.pathParameters.user_id;
-        
-        if (httpMethod != 'GET') {
+
+        if (httpMethod !=='GET') {
             throw new Error(`getUserHandler only accepts GET method, you tried: ${httpMethod}`);
         }
-        
+
         if (userId === undefined || userId === '') {
             throw new Error('No user id provided');
         }
@@ -61,7 +61,7 @@ exports.getUserHandler = async (event, context, callback, connection) => {
         badRequest.reason = exception.message;
         return badRequest;
     }
-    
+
     try {
         if (connection.state === 'disconnected') {
             await new Promise((resolve, reject) => {
@@ -73,19 +73,19 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                     resolve();
                 })
             });
-            
+
             try {
                 var getUserSql = "SELECT * FROM User WHERE user_id = ?";
                 var userId = event.pathParameters.user_id;
                 var formattedGetUserQuery = mysql.format(getUserSql, userId);
-                
+
                 await new Promise((resolve, reject) => {
                     connection.query(formattedGetUserQuery, function(err, results) {
                         if (err) {
                             new Error('There was an issue with the SQL statement');
                             reject();
                         }
-                        
+
                         var user;
                         if (results.length > 0) {
                             user = results[0];
@@ -93,9 +93,9 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                         } else {
                             throw new Error('No users found');
                         }
-                        
+
                         if (user) {
-                            
+
                             response.body.results.user_id = user.user_id;
                             response.body.results.full_name = user.full_name;
                             response.body.results.email_address = user.email_address;
@@ -105,20 +105,20 @@ exports.getUserHandler = async (event, context, callback, connection) => {
                             response.body.results.date_created = user.date_created;
                             response.body.results.date_modified = user.date_modified;
                             response.body.results.signed_up_via_social = user.signed_up_via_social;
-                            
+
                         }
                         connection.end();
                         resolve();
                     });
-                    
+
                 });
-                
+
             } catch (exception) {
                 connection.end();
                 badRequest.reason = exception.message;
                 return badRequest;
             }
-            
+
         }
     } catch (exception) {
         connection.end();
@@ -126,7 +126,7 @@ exports.getUserHandler = async (event, context, callback, connection) => {
         response.reason = exception.message;
         return response;
     }
-    
+
     response.body = JSON.stringify(response.body);
     return response;
 }
