@@ -30,11 +30,15 @@ describe('Test postSocialAuthHandler', () => {
 
     const expectedResult = {
       statusCode: 400,
-      message: 'Bad request',
-      reason: 'postSocialAuthHandler only accepts POST method, you tried: PUT'
+      body: {
+        message: 'Bad request',
+        reason: 'postSocialAuthHandler only accepts POST method, you tried: PUT'
+      }
     };
 
-    expect(result).toEqual(JSON.stringify(expectedResult));
+    expectedResult.body = JSON.stringify(expectedResult.body);
+
+    expect(result).toEqual(expectedResult);
     done();
   });
 
@@ -52,11 +56,15 @@ describe('Test postSocialAuthHandler', () => {
 
     const expectedResult = {
       statusCode: 400,
-      message: 'Bad request',
-      reason: 'postSocialAuthHandler only accepts POST method, you tried: GET'
+      body: {
+        message: 'Bad request',
+        reason: 'postSocialAuthHandler only accepts POST method, you tried: GET'
+      }
     };
 
-    expect(result).toEqual(JSON.stringify(expectedResult));
+    expectedResult.body = JSON.stringify(expectedResult.body);
+
+    expect(result).toEqual(expectedResult);
     done();
   });
 
@@ -77,11 +85,15 @@ describe('Test postSocialAuthHandler', () => {
 
     const expectedResult = {
       statusCode: 400,
-      message: 'Bad request',
-      reason: 'User email not provided'
+      body: {
+        message: 'Bad request',
+        reason: 'User email not provided'
+      }
     };
 
-    expect(result).toEqual(JSON.stringify(expectedResult));
+    expectedResult.body = JSON.stringify(expectedResult.body);
+
+    expect(result).toEqual(expectedResult);
     done();
   });
 
@@ -102,11 +114,13 @@ describe('Test postSocialAuthHandler', () => {
 
     const expectedResult = {
       statusCode: 400,
-      message: 'Bad request',
-      reason: 'Invalid email address'
+      body: {
+        message: 'Bad request',
+        reason: 'Invalid email address'
+      }
     };
-
-    expect(result).toEqual(JSON.stringify(expectedResult));
+    expectedResult.body = JSON.stringify(expectedResult.body);
+    expect(result).toEqual(expectedResult);
     done();
   });
 
@@ -154,7 +168,8 @@ describe('Test postSocialAuthHandler', () => {
 
     };
 
-    expect(result).toEqual(JSON.stringify(expectedResult));
+    expectedResult.body = JSON.stringify(expectedResult.body);
+    expect(result).toEqual(expectedResult);
     done();
   });
 
