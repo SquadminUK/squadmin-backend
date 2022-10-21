@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 const lambda = require('../../../../src/handlers/user/post-user');
 
-var event, context, callback;
+let event, context, callback;
 
 jest.mock('mysql', () => ({
     state: 'disconnected',
@@ -256,6 +256,6 @@ describe('Test postUserHandler', () => {
         expectedResult.body = JSON.stringify(expectedResult.body);
 
         expect(result).toEqual(expectedResult);
-        done(); 
+        done();
     });
 });
