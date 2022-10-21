@@ -24,8 +24,6 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
   async function checkUserExists() {
     return await new Promise((resolve, reject) => {
 
-      console.log(`${event.body.email_address}`);
-      console.log(`Email address: event.body -> ${event.body.email_address}`);
       const userSqlQuery = `SELECT * FROM User WHERE email_address = ?`;
       if (event.body.email_address === null || event.body.email_address === undefined || event.body.email_address === '') {
         reject('User email not provided');
@@ -107,7 +105,7 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
   }
 
   try {
-    if (typeof event === 'string') {
+    if (typeof event.body === 'string') {
       event.body = JSON.parse(event.body);
     }
 

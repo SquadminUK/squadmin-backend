@@ -24,8 +24,6 @@ describe('Test postSocialAuthHandler', () => {
       }
     };
 
-    event = JSON.stringify(event);
-
     const result = await lambda.postSocialAuthHandler(event, context, callback, mysql);
 
     const expectedResult = {
@@ -49,8 +47,6 @@ describe('Test postSocialAuthHandler', () => {
         user_id: 'user_id'
       }
     };
-
-    event = JSON.stringify(event);
 
     const result = await lambda.postSocialAuthHandler(event, context, callback, mysql);
 
@@ -79,7 +75,7 @@ describe('Test postSocialAuthHandler', () => {
         email_address: ''
       }
     };
-    event = JSON.stringify(event);
+    event.body = JSON.stringify(event.body);
 
     const result = await lambda.postSocialAuthHandler(event, context, callback, mysql);
 
@@ -108,7 +104,7 @@ describe('Test postSocialAuthHandler', () => {
         email_address: 'x.com'
       }
     };
-    event = JSON.stringify(event);
+    event.body = JSON.stringify(event.body);
 
     const result = await lambda.postSocialAuthHandler(event, context, callback, mysql);
 
@@ -134,7 +130,7 @@ describe('Test postSocialAuthHandler', () => {
         email_address: 'jamilnawaz88@gmail.com'
       }
     };
-    event = JSON.stringify(event);
+    event.body = JSON.stringify(event.body);
     mysql.query = jest.fn()
       .mockImplementationOnce((query, callback) => callback(null, [
         {
