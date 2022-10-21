@@ -102,7 +102,10 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
   }
 
   try {
-    event = JSON.parse(event);
+    if (typeof event === 'string') {
+      event = JSON.parse(event);
+    }
+
     const {httpMethod} = event;
     if (httpMethod !== 'POST') {
       throw new Error(`postSocialAuthHandler only accepts POST method, you tried: ${httpMethod}`);
