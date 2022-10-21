@@ -24,6 +24,8 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
   async function checkUserExists() {
     return await new Promise((resolve, reject) => {
 
+      console.log(`${event.body.email_address}`);
+      console.log(`Email address: event.body -> ${event.body.email_address}`);
       const userSqlQuery = `SELECT * FROM User WHERE email_address = ?`;
       if (event.body.email_address === null || event.body.email_address === undefined || event.body.email_address === '') {
         reject('User email not provided');
@@ -87,8 +89,9 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
       });
     } catch (exception) {
       connection.end();
-      badRequest.reason = exception.message;
-      return JSON.stringify(badRequest);
+      badRequest.body.reason = exception.message;
+      badRequest.body = JSON.stringify(badRequest.body);
+      return badRequest;
     }
   }
 
@@ -105,7 +108,7 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
 
   try {
     if (typeof event === 'string') {
-      event = JSON.parse(event);
+      event.body = JSON.parse(event.body);
     }
 
     const {httpMethod} = event;
