@@ -154,6 +154,7 @@ describe('Test postSocialAuthHandler', () => {
       body: {
         user: {
           user_id: 'user_id',
+          full_name: 'full_name',
           email_address: 'email_address',
           date_created: 'date_created',
           date_modified: 'date_modified',

@@ -133,6 +133,7 @@ exports.postSocialAuthHandler = async (event, context, callback, connection) => 
               if (userDetails != null) {
                 let user = response.body.user;
                 user.user_id = userDetails.user_id;
+                user.full_name = userDetails.full_name;
                 user.email_address = userDetails.email_address;
                 user.date_created = userDetails.date_created;
                 user.date_modified = userDetails.date_modified;
