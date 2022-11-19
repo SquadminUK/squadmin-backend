@@ -1,0 +1,7 @@
+{
+  "httpMethod": "PUT",
+  "pathParameters": {
+    "user_id": "248ce8b9-8c49-421c-9757-4b02c98792d1"
+  },
+  "body": "{\n    \"full_name\": \"Jamil Nawaz Test\",\n    \"email_address\": \"email@email.com\",\n    \"mobile_number\": \"+447931454501\",\n    \"date_of_birth\": \"1988-11-10\"\n}"
+}
