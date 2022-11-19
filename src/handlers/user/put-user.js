@@ -32,10 +32,38 @@ exports.putUserHandler = async (event, context, callback, connection) => {
     }
   };
 
+  async function updateUserDetails() {
+    return await new Promise((resolve, reject) => {
+      var putUserSql = "UPDATE User SET full_name = COALESCE(?, NULL), email_address = COALESCE(?, NULL), mobile_number = COALESCE(?, NULL), date_of_birth = COALESCE(?, NULL), date_modified = now() WHERE user_id = ?";
+      var userId = [event.body.full_name, event.body.email_address, event.body.mobile_number, event.body.date_of_birth, userId];
+      var formattedUpdateUserQuery = mysql.format(putUserSql, userId);
+
+      connection.query(formattedUpdateUserQuery, function (err, results) {
+        if (err) {
+          new Error('There was an issue with the update user SQL statement');
+          reject('There was an issue with the update user SQL statement');
+        }
+        resolve();
+      });
+    })
+  }
+
   async function retrieveUserDetails(userId) {
     try {
       return await new Promise((resolve, reject) => {
-        let getUserQuery = `SELECT * FROM User WHERE user_id = ?`;
+        let getUserQuery =
+          `SELECT 
+                User.user_id, 
+                User.full_name, 
+                User.email_address, 
+                User.mobile_number,
+                User.username,
+                User.date_of_birth,
+                User.date_created,
+                User.date_modified,
+                User.signed_up_via_social,
+                User.has_registered_via_client
+            FROM User WHERE user_id = ?`;
         let formattedQuery = mysql.format(getUserQuery, userId);
         connection.query(formattedQuery, function (err, results) {
           if (err) {
@@ -53,7 +81,6 @@ exports.putUserHandler = async (event, context, callback, connection) => {
             responseBody.date_of_birth = user['date_of_birth'];
             responseBody.date_created = user['date_created'];
             responseBody.date_modified = user['date_modified'];
-            responseBody.password = user['password'];
             responseBody.signed_up_via_social = Boolean(user['signed_up_via_social']);
             responseBody.has_registered_via_client = Boolean(user['has_registered_via_client']);
             response.body.results = responseBody;
@@ -107,33 +134,13 @@ exports.putUserHandler = async (event, context, callback, connection) => {
             response = badRequest;
             reject('Failed to connect');
           }
-          resolve();
-        })
-      });
-
-      try {
-        var putUserSql = "UPDATE User SET full_name = COALESCE(?, NULL), email_address = COALESCE(?, NULL), mobile_number = COALESCE(?, NULL), date_of_birth = COALESCE(?, NULL), date_modified = now() WHERE user_id = ?";
-        var userId = [event.body.full_name, event.body.email_address, event.body.mobile_number, event.body.date_of_birth, userId];
-        var formattedUpdateUserQuery = mysql.format(putUserSql, userId);
-        console.log(formattedUpdateUserQuery);
-
-        var updateUserQuery = await new Promise((resolve, reject) => {
-          connection.query(formattedUpdateUserQuery, function (err, results) {
-            if (err) {
-              new Error('There was an issue with the update user SQL statement');
-              reject('There was an issue with the update user SQL statement');
-            }
-            resolve();
+          updateUserDetails().then(() => {
+            retrieveUserDetails(userId).then(() => {
+              resolve();
+            });
           });
-        }).then(() => {
-          retrieveUserDetails(userId);
         });
-      } catch (exception) {
-        connection.end();
-        badRequest.reason = exception.message;
-        return badRequest;
-      }
-
+      });
     }
   } catch (exception) {
     connection.end();
